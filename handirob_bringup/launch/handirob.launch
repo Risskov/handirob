@@ -1,4 +1,5 @@
 <launch>
+  <param name="/use_sim_time" value="true" />
   <!-- opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">
   </include>
@@ -6,5 +7,5 @@
   <!-- Lidar -->
   <include file="$(find handirob_bringup)/launch/lds.launch">
   </include>
-  
+
 </launch>
