@@ -3,7 +3,7 @@
   <arg name="model" default="$handirob" doc="model type [handirob, alternative]"/>
   <arg name="configuration_basename" default="handirob_lds_2d.lua"/>
   <arg name="set_base_frame" default="base_footprint"/>
-  <arg name="set_odom_frame" default="odom"/>
+  <arg name="set_odom_frame" default="base_footprint"/>
   <arg name="set_map_frame"  default="map"/>
 
   <!-- Gmapping -->

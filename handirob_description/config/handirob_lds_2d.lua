@@ -20,7 +20,7 @@ options = {
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
   tracking_frame = "imu_link", -- imu_link, If you are using gazebo, use 'base_footprint' (libgazebo_ros_imu's bug)
-  published_frame = "imu_link",
+  published_frame = "base_footprint",
   odom_frame = "odom",
   provide_odom_frame = true,
   publish_frame_projected_to_2d = false,
@@ -50,6 +50,7 @@ TRAJECTORY_BUILDER_2D.missing_data_ray_length = 3.
 TRAJECTORY_BUILDER_2D.use_imu_data = true
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.1)
+-- TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 2
 
 POSE_GRAPH.constraint_builder.min_score = 0.65
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.7
