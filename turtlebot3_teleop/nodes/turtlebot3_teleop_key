@@ -42,7 +42,7 @@ ALTERNATIVE_MAX_LIN_VEL = 0.26
 ALTERNATIVE_MAX_ANG_VEL = 1.82
 
 LIN_VEL_STEP_SIZE = 0.1
-ANG_VEL_STEP_SIZE = 0.025
+ANG_VEL_STEP_SIZE = 0.04
 
 msg = """
 Control Your TurtleBot3!
@@ -151,11 +151,11 @@ if __name__=="__main__":
                 target_linear_vel = checkLinearLimitVelocity(target_linear_vel - LIN_VEL_STEP_SIZE)
                 status = status + 1
                 print(vels(target_linear_vel,target_angular_vel))
-            elif key == 'd' :
+            elif key == 'a' :
                 target_angular_vel = checkAngularLimitVelocity(target_angular_vel + ANG_VEL_STEP_SIZE)
                 status = status + 1
                 print(vels(target_linear_vel,target_angular_vel))
-            elif key == 'a' :
+            elif key == 'd' :
                 target_angular_vel = checkAngularLimitVelocity(target_angular_vel - ANG_VEL_STEP_SIZE)
                 status = status + 1
                 print(vels(target_linear_vel,target_angular_vel))

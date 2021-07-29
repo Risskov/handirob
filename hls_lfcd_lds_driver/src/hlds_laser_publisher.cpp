@@ -123,7 +123,7 @@ void LFCDLaser::poll(sensor_msgs::LaserScan::Ptr scan)
 
               scan->ranges[359-index] = range / 1000.0;
               if (scan->ranges[359-index] == 0.0){
-                scan->ranges[359-index] = 9.0;
+                scan->ranges[359-index] = 4.0;
               }
               scan->intensities[359-index] = intensity;
             }

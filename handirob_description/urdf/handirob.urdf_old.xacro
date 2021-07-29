@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
-<robot name="handirob" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="turtlebot3_handirob" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find handirob_description)/urdf/common_properties.xacro"/>
-  <!--xacro:include filename="$(find handirob_description)/urdf/turtlebot3_handirob.gazebo.xacro"/-->
 
   <xacro:property name="r200_cam_rgb_px" value="0.005"/>
   <xacro:property name="r200_cam_rgb_py" value="0.018"/>
@@ -18,7 +17,8 @@
 
   <link name="base_link">
     <visual>
-      <origin xyz="-0.185 0 -0.04" rpy="1.57 0 -1.57"/>
+      <origin xyz="0.2 0 0" rpy="1.57 0 4.71"/>
+
       <geometry>
         <mesh filename="package://handirob_description/meshes/bases/handirob_base_no_caster.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -40,15 +40,7 @@
                izz="1.4612727e-02" />
     </inertial>
 
-<!--
-    <inertial>
-      <origin xyz="0.2065 0 0.070" rpy="0 0 0"/>
-      <mass value="6.442e+00"/>
-      <inertia ixx="2.309e+08" ixy="-1.437e+07" ixz="-3.481e+06"
-               iyy="3.355e+08" iyz="-1.125e+07"
-               izz="2.849e+08" />
-    </inertial>
-    -->
+
   </link>
 
   <joint name="wheel_left_joint" type="continuous">
@@ -81,21 +73,12 @@
                izz="2.0712558e-05" />
       </inertial>
 
-<!--
-    <inertial>
-      <origin xyz="0 0 0" />
-      <mass value="0.338959" />
-      <inertia ixx="8.402E+05" ixy="5.709E-08" ixz=" 0.138"
-               iyy="1.535E+06" iyz="4.123E-10"
-               izz="8.402E+05" />
-      </inertial>
-    -->
   </link>
 
   <joint name="wheel_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_right_link"/>
-    <origin xyz="0.0 -0.206 0" rpy="1.57 0 3.14"/>
+    <origin xyz="0 -0.206 0" rpy="1.57 0 3.14"/>
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -122,23 +105,13 @@
                iyy="1.1192413e-05" iyz="-1.4400107e-11"
                izz="2.0712558e-05" />
       </inertial>
-<!--
-    <inertial>
-      <origin xyz="0 0 0" />
-      <mass value="0.338959" />
-      <inertia ixx="8.402E+05" ixy="5.709E-08" ixz=" 0.138"
-               iyy="1.535E+06" iyz="4.123E-10"
-               izz="8.402E+05" />
-      </inertial>
-    -->
   </link>
-
 
 
   <joint name="caster_back_right_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_back_right_link"/>
-    <origin xyz="-0.335 -0.21 -0.08" rpy="0 0 0"/>
+    <origin xyz="0.4 -0.21 0" rpy="0 0 0"/>
   </joint>
 
   <link name="caster_back_right_link">
@@ -163,7 +136,7 @@
   <joint name="caster_back_left_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_back_left_link"/>
-    <origin xyz="-0.335 0.21 -0.08" rpy="0 0 0"/>
+    <origin xyz="0.4 0.21 0" rpy="0 0 0"/>
   </joint>
 
   <link name="caster_back_left_link">
@@ -171,7 +144,9 @@
       <origin xyz="0 0.001 0.025" rpy="0 0 0"/>
       <geometry>
         <sphere radius="0.032"/>
-
+    <!--
+        <box size="0.165 0.165 0.110"/>
+    -->
       </geometry>
     </collision>
 
@@ -187,15 +162,15 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="-0.295 0.135 0.13" rpy="0 0 0"/>
+    <origin xyz="0.35 -0.135 0.03" rpy="0 0 0"/>
   </joint>
 
   <link name="imu_link"/>
 
-  <joint name="scan_joint_1" type="fixed">
+  <joint name="scan_joint" type="fixed">
     <parent link="base_link"/>
     <child link="base_scan"/>
-    <origin xyz="-0.3 0 0.26" rpy="0 0 0"/>
+    <origin xyz="0.28 0 0.26" rpy="0 0 0"/>
   </joint>
 
   <link name="base_scan">
@@ -208,7 +183,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+      <origin xyz="0.235 0 -0.0065" rpy="0 0 0"/>
       <geometry>
         <cylinder length="0.0315" radius="0.055"/>
       </geometry>
@@ -244,14 +219,6 @@
       </geometry>
     </collision>
 
-    <!-- This inertial field needs doesn't contain reliable data!! -->
-<!--   <inertial>
-      <mass value="0.564" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
-               iyy="0.000498940" iyz="0.0"
-               izz="0.003879257" />
-    </inertial>-->
   </link>
 
   <joint name="camera_rgb_joint" type="fixed">

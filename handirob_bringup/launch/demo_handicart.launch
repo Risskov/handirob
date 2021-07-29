@@ -19,8 +19,6 @@
 
   <include file="$(find handirob_bringup)/launch/handicart.launch" />
 
-  <!--node name="rviz" pkg="rviz" type="rviz" required="true"
-      args="-d $(find cartographer_ros)/configuration_files/demo_2d.rviz" /-->
   <node name="rviz" pkg="rviz" type="rviz" required="true"
       args="-d $(find handirob_slam)/rviz/handirob_cartographer.rviz" />
   <node name="playbag" pkg="rosbag" type="play"

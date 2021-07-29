@@ -15,8 +15,6 @@
 -->
 
 <launch>
-  <!--param name="robot_description"
-    textfile="$(find handirob_description)/urdf/handirob.urdf.xacro"/-->
 
   <arg name="model" default="$(find handirob_description)/urdf/handirob.urdf.xacro" />
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />

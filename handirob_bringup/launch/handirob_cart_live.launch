@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find handirob_bringup)/launch/handicart.launch" />
+
+  <node name="rviz" pkg="rviz" type="rviz" required="true"
+      args="-d $(find handirob_slam)/rviz/handirob_cartographer.rviz" />
+
+</launch>
