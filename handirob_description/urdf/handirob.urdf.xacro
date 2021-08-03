@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="turtlebot3_handirob" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find handirob_description)/urdf/common_properties.xacro"/>
+  <!--xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" /-->
 
   <xacro:property name="r200_cam_rgb_px" value="0.005"/>
   <xacro:property name="r200_cam_rgb_py" value="0.018"/>
@@ -197,14 +198,16 @@
 
 
   <joint name="camera_joint" type="fixed">
-    <origin xyz="0.16 -0.065 0." rpy="0 0 0"/>
+    <origin xyz="0.2 0 0.1" rpy="0 0 0"/>
+    <!--origin xyz="0.16 -0.065 0.1" rpy="0 0 0"/-->
     <parent link="base_link"/>
     <child link="camera_link"/>
   </joint>
-
+<!--origin xyz="0 0 0" rpy="1.57 0 1.57"/-->
   <link name="camera_link">
-    <visual>
-     <origin xyz="0 0 0" rpy="1.57 0 1.57"/>
+    <!--visual>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+
       <geometry>
        <mesh filename="package://handirob_description/meshes/sensors/r200.dae" />
       </geometry>
@@ -214,7 +217,7 @@
       <geometry>
         <box size="0.012 0.132 0.020"/>
       </geometry>
-    </collision>
+    </collision-->
   </link>
 
   <!--joint name="camera_rgb_joint" type="fixed">
