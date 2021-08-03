@@ -10,4 +10,9 @@ local_costmap:
   rolling_window: true
   width: 3
   height: 3
-  resolution: 0.05
+  resolution: 0.02 # low resolution (>=0.05) may result in overlap in narrow pathways, resulting in no path
+
+  plugins:
+    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+    - {name: voxel_layer, type: "costmap_2d::VoxelLayer"}
+    - {name: inflation_layer,   type: "costmap_2d::InflationLayer"}

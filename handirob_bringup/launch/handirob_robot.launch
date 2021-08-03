@@ -1,11 +1,17 @@
 <launch>
-  <!--param name="/use_sim_time" value="true" /-->
-  <!-- opencr -->
+
+  <!-- Opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">
   </include>
 
   <!-- Lidar -->
   <include file="$(find handirob_bringup)/launch/lds.launch">
+  </include>
+
+  <!-- Realsense -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="filters" value="pointcloud"/>
+    <arg name="initial_reset" value="true"/>
   </include>
 
 </launch>
