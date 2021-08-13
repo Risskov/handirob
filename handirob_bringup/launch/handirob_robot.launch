@@ -1,18 +1,23 @@
 <launch>
+  <arg name="lidar" default="true"/>
+  <arg name="camera" default="true"/>
 
   <!-- Opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">
   </include>
 
   <!-- Lidar -->
-  <include file="$(find handirob_bringup)/launch/lds.launch">
-  </include>
+  <group if="$(arg open_rviz)">
+    <include file="$(find handirob_bringup)/launch/lds.launch">
+    </include>
+  </group>
 
   <!-- Realsense -->
-  <!--include file="$(find realsense2_camera)/launch/rs_camera.launch"-->
-  <include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch">
-    <arg name="filters" value="pointcloud"/>
-    <arg name="initial_reset" value="true"/>
-  </include>
+  <group if="$(arg open_rviz)">
+    <include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch">
+      <arg name="filters" value="pointcloud"/>
+      <arg name="initial_reset" value="true"/>
+    </include>
+  </group>
 
 </launch>

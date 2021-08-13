@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="turtlebot3_handirob" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find handirob_description)/urdf/common_properties.xacro"/>
+  <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
 
   <xacro:property name="r200_cam_rgb_px" value="0.005"/>
   <xacro:property name="r200_cam_rgb_py" value="0.018"/>
@@ -8,16 +9,16 @@
   <xacro:property name="r200_cam_depth_offset" value="0.01"/>
 
   <link name="base_footprint"/>
-
+    <origin xyz="-0.370 0 0" rpy="0 0 0"/>
   <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link" />
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0.18 0 0.04" rpy="0 0 0"/>
   </joint>
 
   <link name="base_link">
     <visual>
-      <origin xyz="0.2 0 0" rpy="1.57 0 4.71"/>
+      <origin xyz="0 0 -0.04" rpy="1.57 0 -1.57"/>
 
       <geometry>
         <mesh filename="package://handirob_description/meshes/bases/handirob_base_no_caster.stl" scale="0.001 0.001 0.001"/>
@@ -26,7 +27,7 @@
     </visual>
 
     <collision>
-      <origin xyz="-0.185 0 0.10" rpy="0 0 0"/>
+      <origin xyz="0 0 0.08" rpy="0 0 0"/>
       <geometry>
         <box size="0.379 0.420 0.242"/>
       </geometry>
@@ -39,20 +40,18 @@
                iyy="8.6195418e-03" iyz="-3.5422299e-06"
                izz="1.4612727e-02" />
     </inertial>
-
-
   </link>
 
   <joint name="wheel_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_left_link"/>
-    <origin xyz="0 0.206 0" rpy="1.57 0 3.14"/>
-    <axis xyz="0 0 1"/>
+    <origin xyz="-0.18 0.206 -0.02" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
   </joint>
 
   <link name="wheel_left_link">
     <visual>
-      <origin xyz="0 0 0" rpy="-1.57 3.14 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://handirob_description/meshes/wheels/wheel_only.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -60,7 +59,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 0.0125" rpy="0 0 3.14"/>
+      <origin xyz="0 0.0125 0" rpy="1.57 0 0"/>
       <geometry>
         <cylinder length="0.025" radius="0.0845"/>
       </geometry>
@@ -78,13 +77,13 @@
   <joint name="wheel_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_right_link"/>
-    <origin xyz="0 -0.206 0" rpy="1.57 0 3.14"/>
-    <axis xyz="0 0 1"/>
+    <origin xyz="-0.18 -0.206 -0.02" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
   </joint>
 
   <link name="wheel_right_link">
     <visual>
-      <origin xyz="0 0 0" rpy="1.57 3.14 0"/>
+      <origin xyz="0 0 0" rpy="3.14 0 0"/>
       <geometry>
         <mesh filename="package://handirob_description/meshes/wheels/wheel_only.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -92,7 +91,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 -0.0125" rpy="0 0 3.14"/>
+      <origin xyz="0 -0.0125 0" rpy="-1.57 0 0"/>
       <geometry>
         <cylinder length="0.025" radius="0.0845"/>
       </geometry>
@@ -105,18 +104,18 @@
                iyy="1.1192413e-05" iyz="-1.4400107e-11"
                izz="2.0712558e-05" />
       </inertial>
-  </link>
 
+  </link>
 
   <joint name="caster_back_right_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_back_right_link"/>
-    <origin xyz="0.4 -0.21 0" rpy="0 0 0"/>
+    <origin xyz="0.16 -0.21 -0.07" rpy="0 0 0"/>
   </joint>
 
   <link name="caster_back_right_link">
     <collision>
-      <origin xyz="0 0.001 0.025" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <sphere radius="0.032"/>
       </geometry>
@@ -131,22 +130,18 @@
     </inertial>
   </link>
 
-
-
   <joint name="caster_back_left_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_back_left_link"/>
-    <origin xyz="0.4 0.21 0" rpy="0 0 0"/>
+    <origin xyz="0.16 0.21 -0.07" rpy="0 0 0"/>
   </joint>
 
   <link name="caster_back_left_link">
     <collision>
-      <origin xyz="0 0.001 0.025" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <sphere radius="0.032"/>
-    <!--
-        <box size="0.165 0.165 0.110"/>
-    -->
+
       </geometry>
     </collision>
 
@@ -162,7 +157,7 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0.35 -0.135 0.03" rpy="0 0 0"/>
+    <origin xyz="0.16 -0.15 0" rpy="0 0 3.1415"/>
   </joint>
 
   <link name="imu_link"/>
@@ -170,7 +165,7 @@
   <joint name="scan_joint" type="fixed">
     <parent link="base_link"/>
     <child link="base_scan"/>
-    <origin xyz="0.28 0 0.26" rpy="0 0 0"/>
+    <origin xyz="0 0 0.26" rpy="0 0 0"/>
   </joint>
 
   <link name="base_scan">
@@ -183,7 +178,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0.235 0 -0.0065" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <cylinder length="0.0315" radius="0.055"/>
       </geometry>
@@ -198,16 +193,25 @@
     </inertial>
   </link>
 
+    <!--origin xyz="0.16 -0.065 0.1" rpy="0 0 0"/-->
+  <!--joint name="camera_joint" type="fixed">
+    <origin xyz="0.2 0 0.1" rpy="0 0 0"/>
 
-  <joint name="camera_joint" type="fixed">
-    <origin xyz="-0.064 -0.065 0.094" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="camera_link"/>
-  </joint>
+  </joint-->
+<!--link name="camera_link"/-->
 
-  <link name="camera_link">
-    <visual>
-     <origin xyz="0 0 0" rpy="1.57 0 1.57"/>
+<xacro:sensor_d435 parent="base_link" use_nominal_extrinsics="false" add_plug="false" use_mesh="true">
+  <origin xyz="0.2 0 0.1" rpy="0 0 0"/>
+</xacro:sensor_d435>
+
+<!--/xacro:sensor_d435-->
+<!--origin xyz="0 0 0" rpy="1.57 0 1.57"/-->
+  <!--link name="camera_link"-->
+    <!--visual>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+
       <geometry>
        <mesh filename="package://handirob_description/meshes/sensors/r200.dae" />
       </geometry>
@@ -217,11 +221,10 @@
       <geometry>
         <box size="0.012 0.132 0.020"/>
       </geometry>
-    </collision>
+    </collision-->
+  <!--/link-->
 
-  </link>
-
-  <joint name="camera_rgb_joint" type="fixed">
+  <!--joint name="camera_rgb_joint" type="fixed">
     <origin xyz="${r200_cam_rgb_px} ${r200_cam_rgb_py} ${r200_cam_rgb_pz}" rpy="0 0 0"/>
     <parent link="camera_link"/>
     <child link="camera_rgb_frame"/>
@@ -247,6 +250,6 @@
     <parent link="camera_depth_frame"/>
     <child link="camera_depth_optical_frame"/>
   </joint>
-  <link name="camera_depth_optical_frame"/>
+  <link name="camera_depth_optical_frame"/-->
 
 </robot>
