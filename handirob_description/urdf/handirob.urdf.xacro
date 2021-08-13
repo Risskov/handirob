@@ -6,7 +6,8 @@
   <xacro:property name="base_offset_x" value="0.20625"/>
   <xacro:property name="base_offset_y" value="0.206"/>
   <xacro:property name="base_offset_z" value="0.041"/>
-  <xacro:property name="pi" value="3.14159"/>
+  <!--xacro:property name="pi" value="3.14159"/-->
+  <xacro:property name="pi_half" value="1.570795"/>
 
 
   <link name="base_footprint"/>
@@ -19,7 +20,7 @@
 
   <link name="base_link">
     <visual>
-      <origin xyz="0 0 0" rpy="${pi}/2 0 -${pi}/2"/>
+      <origin xyz="0 0 0" rpy="${pi_half} 0 -${pi_half}"/>
       <geometry>
         <mesh filename="package://handirob_description/meshes/bases/handirob_base_no_caster.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -59,7 +60,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0.0125 0" rpy="${pi}/2 0 0"/>
+      <origin xyz="0 0.0125 0" rpy="${pi_half} 0 0"/>
       <geometry>
         <cylinder length="0.025" radius="0.0845"/>
       </geometry>
@@ -91,7 +92,7 @@
     </visual>
 
     <collision>
-      <origin xyz="0 -0.0125 0" rpy="-${pi}/2 0 0"/>
+      <origin xyz="0 -0.0125 0" rpy="-${pi_half} 0 0"/>
       <geometry>
         <cylinder length="0.025" radius="0.0845"/>
       </geometry>
@@ -165,7 +166,7 @@
   <joint name="scan_joint" type="fixed">
     <parent link="base_link"/>
     <child link="base_scan"/>
-    <origin xyz="0.101374 0.157273 0.268" rpy="0 0 ${pi}"/>
+    <origin xyz="0.101374 -0.157273 0.268" rpy="0 0 ${pi}"/>
   </joint>
 
   <link name="base_scan">
