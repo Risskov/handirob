@@ -14,7 +14,8 @@
 
   <!-- Realsense -->
   <group if="$(arg camera)">
-    <include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch">
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!--include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"-->
       <arg name="filters" value="pointcloud"/>
       <arg name="initial_reset" value="true"/>
     </include>
