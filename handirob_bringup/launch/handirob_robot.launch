@@ -1,6 +1,7 @@
 <launch>
   <arg name="lidar" default="true"/>
   <arg name="camera" default="true"/>
+  <arg name="pointcloud" default="true"/>
 
   <!-- Opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">
@@ -20,6 +21,10 @@
       <!--arg name="filters" value="pointcloud"/-->
       <!--arg name="initial_reset" value="true"/-->
     </include>
+  </group>
+
+  <group if="$(arg pointcloud)">
+    <include file="$(find handirob_bringup)/launch/point_cloud.launch"/>
   </group>
 
 </launch>
