@@ -1,0 +1,14 @@
+<launch>
+  <!-- Arguments -->
+    <param name="pos_x"             value="-1.9456758499145508"/>
+    <param name="pos_y"             value="3.860194206237793"/>
+    <param name="pos_z"             value="0"/>
+    <param name="rot_x"             value="0"/>
+    <param name="rot_y"             value="0"/>
+    <param name="rot_z"             value="-0.5350149354643828"/>
+    <param name="rot_w"             value="0.8448426000327175"/>
+  <!-- autonomous_navigation -->
+  <node pkg="autonomous_nav" type="set_goal.py" name="set_goal">
+
+  </node>
+</launch>

@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- Aruco Detect -->
+  <include file="$(find aruco_detect)/launch/aruco_detect.launch"> </include>
+
+  <!-- Stand_pose -->
+  <include file="$(find stand_pose)/launch/stand_pose.launch"> </include>
+
+</launch>

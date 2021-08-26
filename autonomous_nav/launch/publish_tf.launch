@@ -1,0 +1,14 @@
+<launch>
+    
+    
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    </include>
+    <include file="$(find aruco_detect)/launch/aruco_detect.launch">
+    </include>
+    <include file="$(find stand_pose)/launch/stand_pose.launch">
+    </include>
+    
+  <node pkg="autonomous_nav" type="SetGoal_server.py" name="Set_robot_goal">
+
+  </node>
+</launch>

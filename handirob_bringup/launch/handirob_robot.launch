@@ -1,7 +1,7 @@
 <launch>
   <arg name="lidar" default="true"/>
   <arg name="camera" default="true"/>
-  <arg name="pointcloud" default="true"/>
+  <arg name="pointcloud" default="false"/>
 
   <!-- Opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">

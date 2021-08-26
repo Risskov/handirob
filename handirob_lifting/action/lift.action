@@ -1,0 +1,10 @@
+# Define the goal
+bool lift  # Specify if robot should lift
+---
+# Define the result
+bool lifting_completed
+---
+# Define a feedback message
+bool switch_acitve
+bool lifting
+

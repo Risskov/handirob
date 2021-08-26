@@ -1,0 +1,5 @@
+<launch>
+
+  <node pkg="stand_pose" type="stand_pose_node.py" name="stand_pose">
+  </node>
+</launch>
