@@ -109,7 +109,7 @@ catkin_package(
   INCLUDE_DIRS src
   LIBRARIES autonomous_nav stand_pose aruco_detect
   CATKIN_DEPENDS rospy
-  DEPENDS system_lib fiducials realsense-ros stand_pose
+  DEPENDS system_lib fiducials realsense-ros stand_pose 
 )
 
 ###########
@@ -169,6 +169,9 @@ include_directories(
    src/SetGoal_client.py
    src/approach_stand.py
    src/TF_Broadcast_test.py
+   #src/find_stand.py
+   src/lifting_mechanism.py
+   #src/Lift_test.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Mark executables for installation

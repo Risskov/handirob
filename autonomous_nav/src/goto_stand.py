@@ -106,6 +106,23 @@ def setup_lift_switch():
     GPIO.setup(13, GPIO.IN)
     GPIO.setup(GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
 
+def goal_data(pose, orientation):
+
+    _goal = MoveBaseGoal()
+    # Init header
+    _goal.target_pose.header.frame_id = "map"
+    _goal.target_pose.header.stamp = rospy.Time.now()
+    # Init goal
+    _goal.target_pose.pose.position.x = pose[0]
+    _goal.target_pose.pose.position.y = pose[1]
+    _goal.target_pose.pose.position.z =  pose[2]
+    _goal.target_pose.pose.orientation.x = orientation[0]
+    _goal.target_pose.pose.orientation.y = orientation[1]
+    _goal.target_pose.pose.orientation.z = orientation[2]
+    _goal.target_pose.pose.orientation.w = orientation[3] 
+
+    return _goal
+
 
 def turn_to_lift2():
 
@@ -120,25 +137,24 @@ def turn_to_lift2():
     stand_orr = calc_stand_orrientation(base_pos, stand_pos)
 
     r = R.from_euler('z', 180, degrees=True)
-    #r1 = R.from_quat([base_quaternion[0], base_quaternion[1], base_quaternion[2], base_quaternion[3]])
     r2 = R.from_quat([stand_orr[0], stand_orr[1], stand_orr[2], stand_orr[3]])
-    #quat = r1.inv()
     quat = r2 * r
     quat = quat.as_quat()
 
     base_quaternion = base_quaternion * r.as_quat()
 
-    rot_goal = MoveBaseGoal()
-    rot_goal.target_pose.header.frame_id = "map"
-    rot_goal.target_pose.header.stamp = rospy.Time.now()
+    #rot_goal = MoveBaseGoal()
+    #rot_goal.target_pose.header.frame_id = "map"
+    #rot_goal.target_pose.header.stamp = rospy.Time.now()
 
-    rot_goal.target_pose.pose.position.x = base_position[0]
-    rot_goal.target_pose.pose.position.y = base_position[1]
-    rot_goal.target_pose.pose.position.z =  base_position[1]
-    rot_goal.target_pose.pose.orientation.x = quat[0]
-    rot_goal.target_pose.pose.orientation.y = quat[1]
-    rot_goal.target_pose.pose.orientation.z = quat[2]
-    rot_goal.target_pose.pose.orientation.w = quat[3] 
+    #rot_goal.target_pose.pose.position.x = base_position[0]
+    #rot_goal.target_pose.pose.position.y = base_position[1]
+    #rot_goal.target_pose.pose.position.z =  base_position[2]
+    #rot_goal.target_pose.pose.orientation.x = quat[0]
+    #rot_goal.target_pose.pose.orientation.y = quat[1]
+    #rot_goal.target_pose.pose.orientation.z = quat[2]
+    #rot_goal.target_pose.pose.orientation.w = quat[3]
+    rot_goal = goal_data(base_position, quat)
     client.send_goal_and_wait(rot_goal)
 
     if client.get_state() == 3:
@@ -317,6 +333,7 @@ def rotate_robot():
     cmd_data.angular.x  = 0.0
     cmd_data.angular.y = 0.0
     rate = rospy.Rate(5)
+    timer = 0
     rospy.loginfo("Starting to turn robot")
     while True:
         if rotation_status == 0:
@@ -330,6 +347,9 @@ def rotate_robot():
             cmd_data.angular.z = 0.08
             cmd_publisher.publish(cmd_data)
             rate.sleep()
+            if timer > 10:
+                rotation_status = 2
+            timer += 1
 
         elif rotation_status == 2: # Fast turning
             
@@ -475,11 +495,11 @@ if __name__ == "__main__":
                     break
                 control_rate.sleep()
 
-            rospy.loginfo("distance to goal is: %f", goal_dist)
-            
-            
-            #delete_dir()
-            turn_to_lift2()
+    rospy.loginfo("distance to goal is: %f", goal_dist)
+
+    turn_to_lift2()
+
+    
 
             
 rospy.spin()

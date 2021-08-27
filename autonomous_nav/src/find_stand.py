@@ -18,7 +18,7 @@ import tf
 from tf.transformations import *
 import numpy as np
 import json
-from handirob_lifting import lifting
+import lifting_mechanism
 # from set_goal import set_goal
 
 
@@ -34,9 +34,6 @@ def get_stand_data(stand_id, path):
     else:
         rospy.logwarn("nonexisiting stand was requested")
         return 0
-    
-def feedbackCb():
-    rospy.loginfo(MoveBaseFeedback)
 
 def calc_stand_orrientation(_base_pos, _stand_pos):
     v2 = np.array([1, 0, 0])
@@ -82,7 +79,7 @@ def send_stand_goal(stand_number, stand_data):
         
         goal_dist = numpy.linalg.norm(stand_pos - base_pos)
         
-        rospy.loginfo("sending goal at: %s", goal.target_pose.pose)  
+        # rospy.loginfo("sending goal at: %s", goal.target_pose.pose)  
         client.send_goal(goal)
         rospy.sleep(1)
         state = client.get_state()
@@ -109,7 +106,29 @@ def setup_lift_switch():
     GPIO.setup(GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
 
 
+def turn_to_lift2():
 
+    t = base_tf.getLatestCommonTime("/base_footprint", "/map")
+    #base_tf.waitForTransform("/base_link", "/map", rospy.get_rostime(), rospy.Duration(10))
+    base_position, base_quaternion = base_tf.lookupTransform("/map", "/base_footprint", t)
+
+
+    rot_goal = MoveBaseGoal()
+    rot_goal.target_pose.header.frame_id = "map"
+    rot_goal.target_pose.header.stamp = rospy.Time.now()
+
+    rot_goal.target_pose.pose.position.x = base_position[0]
+    rot_goal.target_pose.pose.position.y = base_position[1]
+    rot_goal.target_pose.pose.position.z =  base_position[1]
+    rot_goal.target_pose.pose.orientation.x = base_quaternion[0]
+    rot_goal.target_pose.pose.orientation.y = base_quaternion[1]
+    rot_goal.target_pose.pose.orientation.z = base_quaternion[3]
+    rot_goal.target_pose.pose.orientation.w = base_quaternion[2]
+    
+    # rospy.loginfo("sending goal at: %s", goal.target_pose.pose)  
+    client.send_goal(rot_goal)
+
+    
 def turn_to_lift():
     
         # Get position of robot base
@@ -139,6 +158,9 @@ def turn_to_lift():
     diff = 5
     cmd_data.angular.z = angle_speed
     rospy.loginfo("Turning with 0.3 rad/s")
+
+    goal_dist = numpy.linalg.norm(stand_pos - base_pos)
+        
     while True:
         
         t = base_tf.getLatestCommonTime("/base_footprint", "/map")
@@ -155,7 +177,7 @@ def turn_to_lift():
             cmd_data.angular.z = angle_speed
             rospy.loginfo("setting turning speed to: %f", angle_speed)
         
-        if (base_quaternion_new[2] - stand_orr[3]) > 0 :
+        if (base_quaternion_new[2] - stand_orr[3]) < 0 :
             
             angle_speed = 0
             cmd_data.angular.z = angle_speed
@@ -172,12 +194,14 @@ def turn_to_lift():
     #if curr_speed.angular.z == 0:
     if angle_speed <= 0:
         rospy.loginfo("turning complete, approaching stand with 0.1 m/s")
-        setup_lift_switch()
-        GPIO_switch_in = 13
+        # setup_lift_switch()
+        # GPIO_switch_in = 13
+        lifting = lifting_mechanism.lifting_mechanism()
         try:
             cmd_data.linear.x = -0.1
             curr_time = rospy.get_rostime()
-            while not GPIO.input(GPIO_switch_in): # or curr_time - new_time < 5:
+            while not lifting.check_stand():
+            #while not GPIO.input(GPIO_switch_in): # or curr_time - new_time < 5:
                 cmd_publisher.publish(cmd_data)
                     #rospy.loginfo("cmd_data: %s", cmd_data)
                 rospy.sleep(0.1)
@@ -206,7 +230,7 @@ def turn_to_lift():
 
     return 1
 
-class stand_search:
+class stand_search2:
 
     def __init__(self):
         self.stand_sub = rospy.Subscriber("/stand_pose_updated", Int16, self.stand_pose_cb)
@@ -243,7 +267,8 @@ class stand_search:
         print(self.msg)
         return self.msg
 
-def find_stand():
+def rotate_robot():
+    global rotation_status
     cmd_data = Twist()
     cmd_data.linear.x = 0.0
     cmd_data.linear.y = 0.0
@@ -251,19 +276,34 @@ def find_stand():
     cmd_data.angular.x  = 0.0
     cmd_data.angular.y = 0.0
     rate = rospy.Rate(5)
+    rospy.loginfo("Starting to turn robot")
     while True:
-        cmd_data.angular.z = 0.15
-        cmd_publisher.publish(cmd_data)
-        rate.sleep()
-        if stop_thread:
+        if rotation_status == 0:
             cmd_data.angular.z = 0.0
             cmd_publisher.publish(cmd_data)
+            #rospy.loginfo("Stopping rotation")
             break
+
+        elif rotation_status == 1: # slow turning
+            #rospy.loginfo("Slowing down rotation")
+            cmd_data.angular.z = 0.08
+            cmd_publisher.publish(cmd_data)
+            rate.sleep()
+
+        elif rotation_status == 2: # Fast turning
+            
+            cmd_data.angular.z = 0.23
+            cmd_publisher.publish(cmd_data)
+            rate.sleep()
+        else:
+            rospy.logwarn("No speed definition given")
+            break
+        
 
 class get_fiducial_id:
 
     def __init__(self):
-        self.fiducial_sub = rospy.Subscriber("/fiducial_verticies", FiducialTransformArray, self.callback)
+        self.fiducial_sub = rospy.Subscriber("/fiducial_verticies", FiducialArray, self.callback)
 
     def callback(self, msg):
         self.msg = msg
@@ -272,6 +312,48 @@ class get_fiducial_id:
         return(self.fiducials.fiducial_id)
 
     
+
+def stand_search():
+    rospy.loginfo("Starting to explore")
+        #stand_explore = stand_search()
+    global rotation_status, stand_no
+    rotation_status = 2 # turn fast
+    rotation_thread = threading.Thread(target=rotate_robot)
+    rotation_thread.start()
+    #find_fiducial = get_fiducial_id()
+    #while True:
+    #    fiducial_id = find_fiducial.get_fiducial()
+    #    print("Fiducial id: ", fiducial_id)
+    #    if fiducial_id:
+    #        stand_no = fiducial_id
+    #        break
+    while True:
+        #rospy.loginfo("waiting for fiducial data")
+        fiducial_data = rospy.wait_for_message("/fiducial_vertices", FiducialArray)
+        #print(fiducial_data)
+        #print(fiducial_data.fiducials)
+        if len(fiducial_data.fiducials):
+            
+            stand_no = fiducial_data.fiducials[0].fiducial_id
+            rotation_status = 1 # turn slow
+            print("fiducial_id no = ", stand_no)
+            #rotation_thread.join()
+            break
+    
+    try:
+        if stand_no:
+            rospy.loginfo("found stand: %i", stand_no)
+            stand_found = rospy.wait_for_message("stand_pose_updated", Int16)
+            rotation_status = 0 # stop turning
+            #rotation_thread.join()
+            stand_data = get_stand_data(stand_no, path)
+            return stand_data
+    except:
+        rospy.logerr("No stand to be found")
+        return 0
+    #if stand_explore.get_stand():
+    #    print(stand_explore.get_stand)
+
 
 def usage():
     return "%s [stand number]" % sys.argv[0]
@@ -297,7 +379,9 @@ if __name__ == "__main__":
     rospy.init_node("stand_goal_client")
     
 
-    
+    lifting = lifting_mechanism.lifting_mechanism()
+
+    print(lifting.check_stand())
     # print(client.get_state())
 
     
@@ -317,34 +401,8 @@ if __name__ == "__main__":
     rospy.sleep(1)
 
     if not stand_data:
-        rospy.loginfo("Starting to explore")
-        #stand_explore = stand_search()
-        stop_thread = False
-        find_stand_thread = threading.Thread(target=find_stand)
-        find_stand_thread.start()
-        #find_fiducial = get_fiducial_id()
-        #while True:
-        #    fiducial_id = find_fiducial.get_fiducial()
-        #    print("Fiducial id: ", fiducial_id)
-        #    if fiducial_id:
-        #        stand_no = fiducial_id
-        #        break
-        while True:
-            fiducial_data = rospy.wait_for_message("/fiducial_vertices", FiducialArray)
-            #print(fiducial_data)
-            print(fiducial_data.fiducials)
-            if len(fiducial_data.fiducials):
-                stand_no = fiducial_data.fiducials[0]
-                break
-        rospy.loginfo("found stand: %s", stand_no)
-        if stand_no:
-            stop_thread = True
-            find_stand_thread.join()
-        stand_data = get_stand_data(stand_no, path)
-        
-        #if stand_explore.get_stand():
-        #    print(stand_explore.get_stand)
-
+        stand_data = stand_search()
+        print("Sending goal to found stand")
     
     if stand_data:
         old_stand_data = stand_data
@@ -366,10 +424,7 @@ if __name__ == "__main__":
                     goal_dist = send_stand_goal(stand_no, stand_data)
                     rospy.loginfo("Sent new goal to stand %i", stand_no)
                 old_stand_data = stand_data
-
-                print(rospy.get_time() - stand_time)
-
-                if goal_dist < 1 and rospy.get_time() - stand_time < 10:
+                if goal_dist < 1 and rospy.get_time() - stand_time < 10 or client.get_state() == 3:
                     break
                         
             rospy.loginfo("distance to goal is: %f", goal_dist)

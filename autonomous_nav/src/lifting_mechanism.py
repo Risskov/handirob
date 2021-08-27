@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+from genpy.message import check_type
 import rospy
 import actionlib
 import RPi.GPIO as GPIO
@@ -6,6 +7,7 @@ import time
 import threading
 from handirob_lifting.msg import *
 from std_msgs.msg import String
+
 
 class lifting_mechanism:
 
@@ -27,7 +29,10 @@ class lifting_mechanism:
         GPIO.setup(self.__GPIO_switch_in, GPIO.IN)
         GPIO.setup(self.__GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
 
-        
+        #lifting_thread = threading.Thread(target=self.safety_check)
+        #lifting_thread.start()
+
+
     
     def check_stand(self):
         if GPIO.input(self.__GPIO_switch_in) == 1:
@@ -37,15 +42,17 @@ class lifting_mechanism:
 
 
     def lower_stand(self):
-        if self.get_pos():
+        if not self.get_pos():
             GPIO.output(self.__GPIO_lift_1, GPIO.HIGH)
             GPIO.output(self.__GPIO_lift_2, GPIO.LOW)
 
     def lift_stand(self):
-        if self.check_stand():
+        if self.check_stand() and self.get_pos():
             GPIO.output(self.__GPIO_lift_1, GPIO.LOW)
             GPIO.output(self.__GPIO_lift_2, GPIO.HIGH)
             return True
+        
+        
         else:
             rospy.logerr("Stand is not detected")
             return False
@@ -57,10 +64,22 @@ class lifting_mechanism:
         else:
             return False # Stand is not in the lowered position
 
-        if GPIO.input(self.__GPIO_lift_1) == 0 and GPIO.input(self.__GPIO_lift_2) == 1:
-            return 1 # if lifted
-        if GPIO.input(self.__GPIO_lift_1) == GPIO.input(self.__GPIO_lift_2):
-            rospy.logwarn("Lifting mechanism inactive. Lowering lift.")
-            self.lower_stand()
-        return 0
+        #if GPIO.input(self.__GPIO_lift_1) == 0 and GPIO.input(self.__GPIO_lift_2) == 1:
+        #    return 1 # if lifted
+        #if GPIO.input(self.__GPIO_lift_1) == GPIO.input(self.__GPIO_lift_2):
+        #    rospy.logwarn("Lifting mechanism inactive. Lowering lift.")
+        #    self.lower_stand()
+        #return 0
 
+
+    def safety_check(self):
+        while True:
+            if self.check_stand():
+                while True:
+                    if not self.check_stand():
+                        self.lower_stand()
+                    elif self.get_pos():
+                        break
+                    time.sleep(0.1)
+            self.lower_stand()
+            time.sleep(0.5)
