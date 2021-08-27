@@ -1,6 +1,0 @@
-devel_space: /home/daniel/catkin_ws/src/autonomous_nav/devel
-install: false
-install_space: /home/daniel/catkin_ws/src/autonomous_nav/install
-profile: default
-source_space: /home/daniel/catkin_ws/src/autonomous_nav/src
-workspace: /home/daniel/catkin_ws/src/autonomous_nav

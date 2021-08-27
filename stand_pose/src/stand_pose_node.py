@@ -59,7 +59,7 @@ def calc_stand(data, path):
 
                 # python dictionary with key value pairs
                 dict = {'pos' : list([output_pose_stamped.pose.position.x, output_pose_stamped.pose.position.y, output_pose_stamped.pose.position.z]), 'stamp' : {"secs" : data.header.stamp.secs, "nsecs" : data.header.stamp.nsecs} }
-                print(dict)
+                rospy.loginfo("dict: %s", dict)
 
                 # create json object from dictionary
                 json_obj = json.dumps(dict)
