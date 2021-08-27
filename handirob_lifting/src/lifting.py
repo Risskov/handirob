@@ -6,19 +6,6 @@ import time
 from handirob_lifting.msg import *
 from std_msgs.msg import String
 
-GPIO_lift_1 = 6
-GPIO_lift_2 = 12
-GPIO_switch_pwr = 5
-GPIO_switch_in = 13
-
-GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
-
-GPIO.setwarnings(False)
-
-GPIO.setup(GPIO_lift_1, GPIO.OUT, initial=GPIO.HIGH)
-GPIO.setup(GPIO_lift_2, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(GPIO_switch_in, GPIO.IN)
-GPIO.setup(GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
 
 # GPIO.setup(GPIO_switch_pwr, GPIO.HIGH)
 
@@ -55,6 +42,47 @@ def get_pos():
         rospy.logwarn("Lifting mechanism inactive. Lowering lift.")
         lower_stand()
     return 0 # if lowered
+
+
+class lifting_mechanism:
+    
+    def __init__(self):
+        GPIO_lift_1 = 6
+        GPIO_lift_2 = 12
+        GPIO_switch_pwr = 5
+        GPIO_switch_in = 13
+
+        GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
+
+        GPIO.setwarnings(False)
+
+        GPIO.setup(GPIO_lift_1, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(GPIO_lift_2, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(GPIO_switch_in, GPIO.IN)
+        GPIO.setup(GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
+    
+    def lower_stand(self):
+        GPIO.output(self.GPIO_lift_1, GPIO.HIGH)
+        GPIO.output(self.GPIO_lift_2, GPIO.LOW)
+
+    def lift_stand(self):
+        GPIO.output(self.GPIO_lift_1, GPIO.LOW)
+        GPIO.output(self.GPIO_lift_2, GPIO.HIGH)
+
+    def get_pos(self):
+        if GPIO.input(self.GPIO_lift_1) == 0 and GPIO.input(self.GPIO_lift_2) == 1:
+            return 1 # if lifted
+        if GPIO.input(self.GPIO_lift_1) == GPIO.input(self.GPIO_lift_2):
+            rospy.logwarn("Lifting mechanism inactive. Lowering lift.")
+            lower_stand()
+        return 0
+
+    def check_stand(self):
+        if GPIO.input(self.GPIO_switch_in == 1):
+            return True # Stand is attatched
+        else:
+            return False # Stand is not in attached
+
 
 
 class LiftingServer():
