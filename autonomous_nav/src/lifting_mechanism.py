@@ -27,15 +27,17 @@ class lifting_mechanism:
         GPIO.setup(self.__GPIO_lift_1, GPIO.OUT, initial=GPIO.HIGH)
         GPIO.setup(self.__GPIO_lift_2, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(self.__GPIO_switch_in, GPIO.IN)
+        GPIO.setup(self.__GPIO_switch_lowered, GPIO.IN)
         GPIO.setup(self.__GPIO_switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
 
-        #lifting_thread = threading.Thread(target=self.safety_check)
-        #lifting_thread.start()
+        self.run_safety()
 
 
     
     def check_stand(self):
-        if GPIO.input(self.__GPIO_switch_in) == 1:
+        status = GPIO.input(self.__GPIO_switch_in)
+        #print("stand status:", status)
+        if status: #GPIO.input(self.__GPIO_switch_in):
             return True # Stand is attatched
             
         return False # Stand is not in attached
@@ -46,11 +48,14 @@ class lifting_mechanism:
             GPIO.output(self.__GPIO_lift_1, GPIO.HIGH)
             GPIO.output(self.__GPIO_lift_2, GPIO.LOW)
 
-    def lift_stand(self):
-        if self.check_stand() and self.get_pos():
-            GPIO.output(self.__GPIO_lift_1, GPIO.LOW)
-            GPIO.output(self.__GPIO_lift_2, GPIO.HIGH)
-            return True
+    def lift_stand(self, timeout=5):
+        for _ in range(timeout*2):
+            if self.check_stand() and self.get_pos():
+                GPIO.output(self.__GPIO_lift_1, GPIO.LOW)
+                GPIO.output(self.__GPIO_lift_2, GPIO.HIGH)
+                return True
+            else:
+                rospy.sleep(0.5)
         
         
         else:
@@ -78,8 +83,13 @@ class lifting_mechanism:
                 while True:
                     if not self.check_stand():
                         self.lower_stand()
+                        break
                     elif self.get_pos():
                         break
                     time.sleep(0.1)
             self.lower_stand()
             time.sleep(0.5)
+    
+    def run_safety(self):
+        lifting_thread = threading.Thread(target=self.safety_check)
+        lifting_thread.start()

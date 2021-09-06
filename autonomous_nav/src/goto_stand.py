@@ -137,7 +137,7 @@ def turn_to_lift2():
         cmd_data.angular.x  = 0.0
         cmd_data.angular.y = 0.0
         cmd_data.angular.y = 0.0
-        lifting = lifting_mechanism.lifting_mechanism()
+        #lifting = lifting_mechanism.lifting_mechanism()
         pub_rate = rospy.Rate(10)
         while not lifting.check_stand():
             cmd_publisher.publish(cmd_data)
@@ -178,7 +178,7 @@ def rotate_robot():
 
         elif rotation_status == 2: # Fast turning
             
-            cmd_data.angular.z = 0.23
+            cmd_data.angular.z = 0.15
             cmd_publisher.publish(cmd_data)
             rate.sleep()
         else:
@@ -254,6 +254,27 @@ def fetch_stand():
 
     turn_to_lift2()
 
+
+def move_forward(time = 4, direction = True):
+    cmd_data = Twist()
+    if direction:
+        cmd_data.linear.x = 0.1
+    else:
+        cmd_data.linear.x = -0.1
+    cmd_data.linear.y = 0.0
+    cmd_data.linear.z = 0.0
+    cmd_data.angular.x  = 0.0
+    cmd_data.angular.y = 0.0
+    cmd_data.angular.y = 0.0
+    #lifting = lifting_mechanism.lifting_mechanism()
+    pub_rate = rospy.Rate(10)
+    for _ in range (time*10):
+        cmd_publisher.publish(cmd_data)
+        pub_rate.sleep()
+
+    cmd_data.linear.x = 0
+    cmd_publisher.publish(cmd_data)
+
 def usage():
     return "%s [stand number]" % sys.argv[0]
 
@@ -294,7 +315,7 @@ if __name__ == "__main__":
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
     rospy.loginfo("Waiting for Move Base server")
     client.wait_for_server()
-    
+    lifting = lifting_mechanism.lifting_mechanism()
     base_tf = tf.TransformListener()
     rospy.sleep(1)
 
@@ -305,10 +326,30 @@ if __name__ == "__main__":
     fetch_stand()
 
     #go to init pose
+    lifting.lift_stand()
+    rospy.sleep(5)
+
+    move_forward(4, False)
+    lifting.lower_stand()
+    rospy.sleep(5)
+    move_forward(5)
 
     init_goal = goal_data(init_base_position, init_base_quaternion)
     client.send_goal_and_wait(init_goal)
 
+    stand_data = None
+    fetch_stand()
+
+    lifting.lift_stand()
+    rospy.sleep(5)
+
+    move_forward(4, False)
+    lifting.lower_stand()
+    rospy.sleep(5)
+    move_forward(5)
+
+    init_goal = goal_data(init_base_position, init_base_quaternion)
+    client.send_goal_and_wait(init_goal)
 
 
 
