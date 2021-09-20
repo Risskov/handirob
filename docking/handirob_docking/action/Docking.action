@@ -1,0 +1,6 @@
+bool start
+---
+bool result
+---
+float32 distance
+bool module_lifted

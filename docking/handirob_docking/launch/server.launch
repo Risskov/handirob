@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="object_topic" default="/tracked_obstacles" />
+    <arg name="cmd_vel_topic" default="/cmd_vel" />
+    <arg name="camera_frame" default="base_link" />
+    <node name="docking_server" pkg="handirob_docking" type="docking_server.py" output="screen" required="true">
+        <param name="object_topic" value="$(arg object_topic)" />
+        <param name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+        <param name="camera_frame" value="$(arg camera_frame)" />
+    </node>
+
+</launch>

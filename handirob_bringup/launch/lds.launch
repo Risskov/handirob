@@ -1,8 +1,50 @@
 <launch>
-  <arg name="set_frame_id" default="base_scan"/>
+  <arg name="set_frame_id1" default="left_scan"/>
 
-  <node pkg="hls_lfcd_lds_driver" type="hlds_laser_publisher" name="handirob_lds" output="screen">
+  <node pkg="hls_lfcd_lds_driver" type="hlds_laser_publisher" name="$(arg set_frame_id1)" output="screen">
     <param name="port" value="/dev/ttyUSB0"/>
-    <param name="frame_id" value="$(arg set_frame_id)"/>
+    <param name="frame_id" value="$(arg set_frame_id1)"/>
+    <remap from="scan" to="$(arg set_frame_id1)"/>
+  </node>
+
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter_right">
+    <rosparam command="load" file="$(find handirob_bringup)/launch/includes/$(arg set_frame_id1)_config.yml" />
+    <remap from="scan" to="$(arg set_frame_id1)" />
+    <remap from="scan_filtered" to="$(arg set_frame_id1)_filtered" />
+  </node>
+
+  <arg name="set_frame_id2" default="right_scan"/>
+
+  <node pkg="hls_lfcd_lds_driver" type="hlds_laser_publisher" name="$(arg set_frame_id2)" output="screen">
+    <param name="port" value="/dev/ttyUSB1"/>
+    <param name="frame_id" value="$(arg set_frame_id2)"/>
+    <remap from="scan" to="$(arg set_frame_id2)"/>
+  </node>
+
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter_left">
+    <rosparam command="load" file="$(find handirob_bringup)/launch/includes/$(arg set_frame_id2)_config.yml" />
+    <remap from="scan" to="$(arg set_frame_id2)" />
+    <remap from="scan_filtered" to="$(arg set_frame_id2)_filtered" />
+  </node>
+
+  <node name="scans_merger" pkg="obstacle_detector" type="scans_merger_node">
+    <param name="active"            value="true"/>
+    <param name="publish_scan"      value="true"/>
+    <param name="publish_pcl"       value="false"/>
+
+    <param name="ranges_num"        value="1000"/>
+
+    <param name="min_scanner_range" value="0.0.05"/>
+    <param name="max_scanner_range" value="10.0"/>
+
+    <param name="min_x_range"       value="-10.0"/>
+    <param name="max_x_range"       value="10.0"/>
+    <param name="min_y_range"       value="-10.0"/>
+    <param name="max_y_range"       value="10.0"/>
+
+    <param name="fixed_frame_id"   value="base_link"/>
+    <param name="target_frame_id"   value="base_link"/>
+    <remap from="rear_scan" to="right_scan_filtered"/>
+    <remap from="front_scan" to="left_scan_filtered"/>
   </node>
 </launch>

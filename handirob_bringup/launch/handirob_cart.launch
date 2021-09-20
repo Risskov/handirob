@@ -16,12 +16,13 @@
 
 <launch>
 
+<!--
   <arg name="model" default="$(find handirob_description)/urdf/handirob.urdf.xacro" />
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher"
     type="robot_state_publisher" />
-
+-->
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find handirob_description)/config

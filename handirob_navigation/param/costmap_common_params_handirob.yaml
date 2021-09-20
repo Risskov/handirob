@@ -3,11 +3,11 @@
 #obstacle_range: 3.0 # max dist an obstacle will be inserted
 #raytrace_range: 3.5 # range to raytrace out obstacles from map using sensor data
 
-footprint: [[0.1, 0.25], [0.1, -0.25], [-0.5, -0.25], [-0.5, 0.25]]
+footprint: [[0.3, 0.25], [0.3, -0.25], [-0.4, -0.25], [-0.4, 0.25]]
 #robot_radius: 0.17
 
-inflation_radius: 0.5 # how much the obstacles are inflated
-cost_scaling_factor: 2.6 # how steep the curve of values within inflated area
+inflation_radius: 0.7 # how much the obstacles are inflated
+cost_scaling_factor: 25 # how steep the curve of values within inflated area
 # high inflation means it will take big curve around obstacles, but stay in middle of corridors
 map_type: costmap
 
@@ -15,9 +15,9 @@ obstacle_layer:
   observation_sources: scan
   #scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}
   scan:
-    topic: scan
+    topic: /scan
     data_type: LaserScan
-    sensor_frame: base_scan
+    sensor_frame: base_link
     marking: true
     clearing: true
     obstacle_min_range: 0.3
@@ -38,8 +38,8 @@ voxel_layer:
     min_obstacle_height: -0.05
     obstacle_range: 2.0
     raytrace_range: 2.5
-    marking: true
-    clearing: true
+    marking: false
+    clearing: false
 
   #unknown_threshold: 0
   #mark_threshold: 2
