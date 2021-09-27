@@ -4,11 +4,11 @@ import rospy
 import actionlib
 from geometry_msgs.msg import PoseStamped, Twist
 from object_msgs.msg import Objects
-from smooth_docking.msg import DockingAction, DockingFeedback, DockingResult
+from handirob_docking.msg import DockingAction, DockingFeedback, DockingResult
 from std_srvs.srv import Trigger
-from scipy.spatial.transform import Rotation as R
 import tf2_ros
 import tf2_geometry_msgs
+import Jetson.GPIO as GPIO
 
 class DockingServer():
     _feedback = DockingFeedback()
@@ -18,31 +18,32 @@ class DockingServer():
         self.camera_frame = rospy.get_param('~camera_frame')
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(1200.0))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-        self._as = actionlib.SimpleActionServer(name, DockingAction, execute_cb=self._docking_behavior, auto_start=False)
+        self._as = actionlib.SimpleActionServer(name, DockingAction, execute_cb=self._docking_behavior_request, auto_start=False)
         self.lift_bin_srv = rospy.ServiceProxy('/lifting_server/lift_module', Trigger)
+        self.lower_bin_srv = rospy.ServiceProxy('/lifting_server/lower_module', Trigger)
         cmd_vel_topic = rospy.get_param('~cmd_vel_topic')
         self.pub = rospy.Publisher(cmd_vel_topic, Twist, queue_size = 10)
         object_topic = rospy.get_param('~object_topic')
         self.object_sub = rospy.Subscriber(object_topic, Objects, self._object_callback)
         self._restart_signals()
 
+        GPIO.setmode(GPIO.BCM)
+        self.switch_in = 13
+        self.switch_low = 26
+        GPIO.setup((self.switch_in, self.switch_low), GPIO.IN)
+        if not bool(GPIO.input(self.switch_low)):
+            self._lower_module()
+
         self.linear_speed = 0.1
-        self.k0 = 0.3
-        self.k1 = 1.0
-        self.k2 = 0.25
-        self.docking_tolerance = 0.25
-        self.wall_tolerance = 0.24
+        self.k = 0.6
 
         self._as.start()
         # self._docking_behavior()
 
     def _restart_signals(self):
-        self.plane_dist = None
-        self.plane_angle = None
         self.object_dx = None
         self.object_dy = None
         self.object_dist = None
-        self.object_angle = None
 
     def _transform_pose(self, header, pose):
         pose_stamped = PoseStamped(pose=pose, header=header)
@@ -60,7 +61,7 @@ class DockingServer():
         for object_msg in objects.objects:
             if object_msg.label == 100:
                 pose = object_msg.poses[0].pose
-                self.bin_pos = pose.position
+                self.module_pos = pose.position
                 pose = self._transform_pose(object_msg.header, pose)
                 if pose is not None:
                     object_dist = math.hypot(pose.position.x, pose.position.y)
@@ -69,8 +70,6 @@ class DockingServer():
                         self.object_dist = object_dist
                         self.object_dx = pose.position.x
                         self.object_dy = pose.position.y
-                        quat = pose.orientation
-                        self.object_angle = R.from_quat([quat.x, quat.y, quat.z, quat.w]).as_euler('xyz')[2]
 
     def _preempt(self):
         self._send_cmd_vel(0, 0)
@@ -83,7 +82,7 @@ class DockingServer():
         self._as.publish_feedback(self._feedback)
 
     def _wait_for_object(self, r):
-        while self.object_dist is None or self.plane_angle is None:
+        while self.object_dist is None:
             if self._as.is_preempt_requested():
                 self._preempt()
                 return False
@@ -91,43 +90,28 @@ class DockingServer():
         return True
 
     def _initial_rotation(self, r):
-        off_dist = self.object_dist * math.sin(self.object_angle - math.atan2(self.object_dy, self.object_dx))
-        while round(self.object_dy + off_dist * self.k1, 1) != 0:
+        while round(self.object_dy, 2) != 0:
             if self._as.is_preempt_requested():
                 self._preempt()
                 return False
-            angular_vel = self.k0 * (self.object_dy + off_dist * self.k1)
+            angular_vel = self.k * self.object_dy
             self._send_cmd_vel(0, angular_vel)
-            self._publish_feedback(self.object_dist, False)
+            self._publish_feedback(self.object_dy, False)
             r.sleep()
         return True
 
     def _docking(self, r):
-        robot_pos = self.tf_buffer.lookup_transform("map", self.camera_frame, rospy.Time.now(), rospy.Duration(0.1)).transform.translation
-        dist = math.hypot(self.bin_pos.x - robot_pos.x, self.bin_pos.y - robot_pos.y)
-        while (dist > self.docking_tolerance) and self.k2 * math.tan(self.plane_angle) - self.plane_dist > self.wall_tolerance:
+        while not bool(GPIO.input(self.switch_in)):
             if self._as.is_preempt_requested():
                 self._preempt()
                 return False
-            self._send_cmd_vel(-1 * self.linear_speed, self.k0 * self.object_dy)
-            robot_pos = self.tf_buffer.lookup_transform("map", self.camera_frame, rospy.Time.now(), rospy.Duration(0.1)).transform.translation
-            dist = math.hypot(self.bin_pos.x - robot_pos.x, self.bin_pos.y - robot_pos.y)
+            self._send_cmd_vel(self.linear_speed, self.k * self.object_dy)
             self._publish_feedback(self.object_dist, False)
             r.sleep()
         self._send_cmd_vel(0, 0)
         return True
 
-    def _clear_wall(self, r):
-        while self.plane_dist > -0.6:
-            if self._as.is_preempt_requested():
-                self._preempt()
-                return False
-            self._send_cmd_vel(self.linear_speed, self.k0 * self.plane_angle)
-            self._publish_feedback(self.plane_dist, True)
-            r.sleep()
-        return True
-
-    def _docking_behavior(self, req):
+    def _docking_behavior(self):
         self._restart_signals()
         r = rospy.Rate(10)
         print('waiting')
@@ -136,25 +120,30 @@ class DockingServer():
         print('rotating')
         if not self._initial_rotation(r):
             return
-        print('docking')
-        if not self._docking(r):
-            return
-        self._lift_module()
-        if not self._clear_wall(r):
-            return
-
+        # print('docking')
+        # if not self._docking(r):
+        #     return
+        # self._lift_module()
+    
+    def _docking_behavior_request(self, req):
+        self._docking_behavior()
         self._result.result = True
         self._as.set_succeeded(self._result)
 
     def _send_cmd_vel(self, linear, angular):
         msg = Twist()
-        msg.linear.x = linear
-        msg.angular.z = angular
+        msg.linear.x = -linear
+        msg.angular.z = -angular
         self.pub.publish(msg)
 
     def _lift_module(self):
         print('Lifting')
         resp = self.lift_bin_srv()
+        return resp.success
+
+    def _lower_module(self):
+        print('Lowering')
+        resp = self.lower_bin_srv()
         return resp.success
 
 

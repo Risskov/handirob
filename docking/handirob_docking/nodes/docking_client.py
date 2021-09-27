@@ -7,17 +7,17 @@ import actionlib
 
 # Brings in the messages used by the fibonacci action, including the
 # goal message and the result message.
-import smooth_docking.msg
+import handirob_docking.msg
 
 def docking_client():
     # Creates the SimpleActionClient, passing the type of the action
-    client = actionlib.SimpleActionClient('docking_server', smooth_docking.msg.dockingAction)
+    client = actionlib.SimpleActionClient('docking_server', handirob_docking.msg.DockingAction)
 
     # Waits until the action server has started up and started
     # listening for goals.
     client.wait_for_server()
     # Creates a goal to send to the action server.
-    goal = smooth_docking.msg.dockingGoal(start=True)
+    goal = handirob_docking.msg.DockingGoal(start=True)
 
     # Sends the goal to the action server.
     client.send_goal(goal)

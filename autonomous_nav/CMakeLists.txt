@@ -163,12 +163,12 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   src/set_goal.py
-   src/set_init_pose.py
+   scripts/set_goal.py
+   scripts/set_init_pose.py
    src/SetGoal_server.py
    src/SetGoal_client.py
    src/approach_stand.py
-   src/TF_Broadcast_test.py
+   scripts/TF_Broadcast_test.py
    #src/find_stand.py
    src/lifting_mechanism.py
    #src/Lift_test.py

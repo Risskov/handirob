@@ -4,8 +4,8 @@ import rospy
 import actionlib
 import Jetson.GPIO as GPIO
 from std_srvs.srv import Trigger, TriggerResponse
-from smooth_lifting.msg import LiftingAction, LiftingFeedback, LiftingResult
-from smooth_lifting.msg import LoweringAction, LoweringFeedback, LoweringResult
+from handirob_lifting.msg import LiftingAction, LiftingFeedback, LiftingResult
+from handirob_lifting.msg import LoweringAction, LoweringFeedback, LoweringResult
 
 
 class LiftingMechanism:
@@ -19,10 +19,15 @@ class LiftingMechanism:
         self.lower_service = rospy.Service('~lower_module', Trigger, self._lower_srv)
         self._as_lift = actionlib.SimpleActionServer(rospy.get_name(), LiftingAction, execute_cb=self._lift_action, auto_start=False)
         self._as_lower = actionlib.SimpleActionServer(rospy.get_name(), LoweringAction, execute_cb=self._lower_action, auto_start=False)
-        GPIO.setmode(GPIO.BOARD)
-        self.pins = [6, 12]
-        GPIO.setup(self.pins, GPIO.OUT)
-        self.sleep_time = 12
+        GPIO.setmode(GPIO.BCM)
+        self.lift = [6, 12]
+        GPIO.setup(self.lift, GPIO.OUT, initial=(GPIO.HIGH, GPIO.LOW))
+        self.switch_pwr = 5
+        GPIO.setup(self.switch_pwr, GPIO.OUT, initial=GPIO.HIGH)
+        self.switch_in = 13
+        self.switch_low = 26
+        GPIO.setup((self.switch_in, self.switch_low), GPIO.IN)
+        self.sleep_time = 3
         self.state = 'LOW'
         self._lower()
         self._as_lift.start()
@@ -32,40 +37,51 @@ class LiftingMechanism:
         time.sleep(self.sleep_time)
     
     def _lower(self):
-        GPIO.output(self.pins, (GPIO.LOW, GPIO.LOW))
+        GPIO.output(self.lift, (GPIO.HIGH, GPIO.LOW))
         print('Lowering module')
 
     def _lift(self):
-        GPIO.output(self.pins, (GPIO.HIGH, GPIO.HIGH))
+        GPIO.output(self.lift, (GPIO.LOW, GPIO.HIGH))
         print('Lifting module')
 
-    # def _reset(self, mode):
-    #     GPIO.output(self.pins, (GPIO.LOW, GPIO.LOW))
-    #     print('{} module'.format(mode))
+    def _is_low(self):
+        return bool(GPIO.input(self.switch_low))
+
+    def _is_in(self):
+        return bool(GPIO.input(self.switch_in))
 
     def _lift_srv(self, req):
-        if self.state == 'LOW':
+        if self._is_in() and self._is_low():
             self._lift()
             self._wait()
-            # self._reset('Lifted')
-            self.state = 'HIGH'
-            return TriggerResponse(True, self.state)
-        return TriggerResponse(False, self.state)
-
+            return TriggerResponse(True, 'Module lifted')
+        elif self._is_in():
+            return TriggerResponse(True, 'Module already lifted')
+        elif not self._is_low():
+            return TriggerResponse(False, 'Lifter alreay lifted')
+        return TriggerResponse(False, 'Module not docked')
+        
     def _lower_srv(self, req):
-        if self.state == 'HIGH':
+        if not self._is_low():
             self._lower()
             self._wait()
-            # self._reset('Lowered')
-            self.state = 'LOW'
-            return TriggerResponse(True, self.state)
-        return TriggerResponse(False, self.state)
+            if self._is_in() and self._is_low():
+                return TriggerResponse(True, 'Module lowered')
+            elif self._is_low():
+                return TriggerResponse(True, 'Lifter lowered')
+            return TriggerResponse(False, 'Lowering failed')
+        elif self._is_in():
+            return TriggerResponse(True, 'Module already lowered')
+        return TriggerResponse(True, 'Lifter already lowered')
+
 
     def _lift_action(self, goal):
-        if self.state == 'HIGH':
-            self._lift_result.result = False
+        def set_result(result, message):
+            self._lift_result.result = result
+            self._lift_result.msg = message
             self._as_lift.set_succeeded(self._lift_result)
-        else:
+
+        if self._is_in() and self._is_low():
             r = rospy.Rate(1)
             time_remaining = self.sleep_time
             self._lift()
@@ -75,16 +91,21 @@ class LiftingMechanism:
                 time_remaining -= 1
                 print(time_remaining)
                 r.sleep()
-            self._reset('Lifted')
-            self.state = 'HIGH'
-            self._lift_result.result = True
-            self._as_lift.set_succeeded(self._lift_result)
+            set_result(True, 'Module lifted')
+        elif self._is_in():
+            set_result(True, 'Module already lifted')
+        elif not self._is_low():
+            set_result(False, 'Lifter already lifted')
+        else:
+            set_result(False, 'Module not docked')
 
     def _lower_action(self, goal):
-        if self.state == 'LOW':
-            self._lower_result.result = False
+        def set_result(result, message):
+            self._lower_result.result = result
+            self._lower_result.msg = message
             self._as_lower.set_succeeded(self._lower_result)
-        else:
+
+        if not self._is_low():
             r = rospy.Rate(1)
             time_remaining = self.sleep_time
             self._lower()
@@ -94,14 +115,21 @@ class LiftingMechanism:
                 time_remaining -= 1
                 print(time_remaining)
                 r.sleep()
-            self._reset('Lowered')
-            self.state = 'LOW'
-            self._lower_result.result = True
-            self._as_lower.set_succeeded(self._lower_result)
-
+            if self._is_in() and self._is_low():
+                set_result(True, 'Module lowered')
+            elif self._is_low():
+                set_result(True, 'Lifter lowered')
+            else:
+                set_result(False, 'Lowering failed')
+        elif self._is_in():
+            set_result(True, 'Module already lowered')
+        else:
+            set_result(True, 'Lifter already lowered')
 
     def shutdown(self):
-        GPIO.cleanup(self.pins)
+        GPIO.cleanup(self.lift)
+        GPIO.cleanup(self.switch_pwr)
+        GPIO.cleanup(self.switch_in)
 
 def main():
     rospy.init_node('LiftingMechanism', anonymous=True, log_level=rospy.INFO)

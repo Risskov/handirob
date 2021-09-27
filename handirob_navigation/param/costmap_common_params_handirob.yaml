@@ -3,12 +3,11 @@
 #obstacle_range: 3.0 # max dist an obstacle will be inserted
 #raytrace_range: 3.5 # range to raytrace out obstacles from map using sensor data
 
-footprint: [[0.3, 0.25], [0.3, -0.25], [-0.4, -0.25], [-0.4, 0.25]]
+footprint: [[0.3, 0.25], [0.3, -0.25], [-0.25, -0.25], [-0.25, 0.25]]
 #robot_radius: 0.17
 
-inflation_radius: 0.7 # how much the obstacles are inflated
-cost_scaling_factor: 25 # how steep the curve of values within inflated area
-# high inflation means it will take big curve around obstacles, but stay in middle of corridors
+
+    # high inflation means it will take big curve around obstacles, but stay in middle of corridors
 map_type: costmap
 
 obstacle_layer:

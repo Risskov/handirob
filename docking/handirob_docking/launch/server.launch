@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="object_topic" default="/tracked_obstacles" />
+    <arg name="object_topic" default="/module_detector/objects" />
     <arg name="cmd_vel_topic" default="/cmd_vel" />
     <arg name="camera_frame" default="base_link" />
     <node name="docking_server" pkg="handirob_docking" type="docking_server.py" output="screen" required="true">

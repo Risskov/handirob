@@ -1,7 +1,4 @@
 <launch>
-  <arg name="lidar" default="true"/>
-  <arg name="camera" default="true"/>
-  <arg name="pointcloud" default="false"/>
   <arg name="model" default="handirob"/>
   <arg name="multi_robot_name" default=""/>
 
@@ -13,30 +10,4 @@
   <include file="$(find handirob_bringup)/launch/handirob_remote.launch">
     <arg name="model" value="$(arg model)" />
   </include>
-
-  <!-- Lidar -->
-  <group if="$(arg lidar)">
-    <include file="$(find handirob_bringup)/launch/lds.launch">
-    </include>
-  </group>
-  
-  <!-- Realsense -->
-  <group if="$(arg camera)">
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    <!--include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"-->
-      <arg name="enable_sync"         value="true"/>
-      <arg name="enable_pointcloud"   value="$(arg pointcloud)"/>
-      <arg name="align_depth"         value="true"/>
-      <arg name="depth_fps"           value="15"/>
-      <arg name="depth_width"         value="1280"/>
-      <arg name="depth_height"        value="720"/>
-      <arg name="enable_depth"        value="true"/>
-
-      <arg name="color_fps"           value="15"/>
-      <arg name="color_width"         value="1280"/>
-      <arg name="color_height"        value="720"/>
-      <arg name="enable_color"        value="true"/>
-    </include>
-  </group>
-
 </launch>
