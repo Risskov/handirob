@@ -10,7 +10,7 @@ This will kill the currently running roscore and start a new with the beforement
 
 ## Start sensors
 To start the lidars and their merging, as well as the camera run the following:  
-`roslaunch handirob_bringup handirob_sensors.launch`
+`roslaunch handirob_bringup handirob_sensors.launch`  
 Individual nodes can be excluded using `dual_lidar:=false`, `camera:=false` or `pointcloud:=false`  
 The pointcloud is disabled by default
 
