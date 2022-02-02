@@ -1,0 +1,8 @@
+<!-- Run the aruco_detect node -->
+<launch>
+	<!-- namespace for camera input -->
+	<node pkg="ui_control" name="ui_server" type="ui_server.py" output="screen"> </node>
+	<node pkg="rosbridge_server" name="rosbridge_websocket"
+		type="rosbridge_websocket" output="screen" respawn="false">
+	</node>
+</launch>

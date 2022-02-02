@@ -19,23 +19,25 @@ class ModuleDetector:
     def callback(self, scan):
         cloud = self.lp.projectLaser(scan)
         cloud = numpify(cloud)
-        cloud = np.asarray([cloud['x'], cloud['y']]).T
-        clusters = fclusterdata(cloud, 0.05, criterion="distance")
-        cloud = cloud[clusters == np.bincount(clusters).argmax()]
+        if cloud.size > 10: 
+            cloud = np.asarray([cloud['x'], cloud['y']]).T
+            clusters = fclusterdata(cloud, 0.05, criterion="distance")
+            cloud = cloud[clusters == np.bincount(clusters).argmax()]
 
-        point = PointStamped(header=scan.header)
-        centroid = np.mean(cloud, axis=0)
-        point.point.x = centroid[0]
-        point.point.y = centroid[1]
-        self.pub_point.publish(point)
+            point = PointStamped(header=scan.header)
+            centroid = np.mean(cloud, axis=0)
+            point.point.x = centroid[0]
+            point.point.y = centroid[1]
+            point.point.y -= 0.015
+            self.pub_point.publish(point)
 
-        msg = Objects(header=scan.header)
-        obj = Object(header=scan.header, label=100)
-        pose = PoseWithLabel(label='Module')
-        pose.pose.position = point.point
-        obj.poses.append(pose)
-        msg.objects.append(obj)
-        self.pub_obj.publish(msg)
+            msg = Objects(header=scan.header)
+            obj = Object(header=scan.header, label=100)
+            pose = PoseWithLabel(label='Module')
+            pose.pose.position = point.point
+            obj.poses.append(pose)
+            msg.objects.append(obj)
+            self.pub_obj.publish(msg)
 
 def main():
     rospy.init_node('ModuleDetector', anonymous=True, log_level=rospy.INFO)

@@ -1,0 +1,121 @@
+html,
+body {
+	height: 100%;
+	width: 100%;
+}
+/* Kæmpe idéer
+	*	Jeg skal gender robotten med en bowtie eller lignende
+		https://ieeexplore.ieee.org/document/9484260
+
+	Følge path:
+	*	https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Motion_Path
+	
+	Mund:
+		https://css-tricks.com/almanac/properties/s/stroke-linecap/
+		SVG coordinate syntax
+		https://developer.mozilla.org/en-US/docs/Web/CSS/offset-path
+		Potentielt også til øjne
+
+https://css-tricks.com/animate-svg-path-changes-in-css/
+Alternativ måde at lave øjne, så de kan transformere om til andre forme.
+*/
+* {
+	cursor: vertical-text;
+}
+body {
+	display: flex;
+	background: rgb(0, 0, 0);
+	overflow: hidden;
+	/* Hide scrollbars */
+}
+.face {
+	position: relative;
+	top: -150px;
+	right: 0px;
+	width: 0;
+	height: 0;
+	transition: transform 1s;
+}
+.faceMovement {
+	position: relative;
+	animation: shake 20s;
+	animation-iteration-count: infinite;
+}
+.eye {
+	position: absolute;
+	overflow: hidden;
+	/*display: inline-block;*/
+	margin: 0px;
+	width: 150px;
+	height: 300px;
+	top: 0;
+	background: white;
+	border-radius: 75px;
+	transition: height 0.05s, border-radius 0.1s, margin 0.1s, top 0.1s, background 0.1s, transform 1s;
+}
+.lid {
+	position: absolute;
+	/*display: inline-block;*/
+	margin: 0px;
+	width: 190px;
+	height: 300px;
+	background: rgb(0, 0, 0);
+	border-radius: 95px;
+	transition: height 0.05s, border-radius 0.1s, margin 0.1s, top 0.1s, background 0.1s, transform 1s;
+}
+
+.ulid {
+	top:-300px;
+	width:250px;
+	transition: 1s;
+}
+
+.llid {
+	top: 250px;
+}
+
+.pupil {
+	position: absolute;
+	visibility: visible;
+	width: 60px;
+	height: 70px;
+	top: 150px;
+	border-radius: 30px;
+	background: black;
+	transition: height 0.1s, transform 0.05s, background 0.1s;
+}
+@keyframes shake {
+	0% {
+		transform: translate(0px, 0px) rotate(0deg);
+	}
+	6% {
+		transform: translate(-10px, -2px) rotate(-1deg);
+	}
+	18% {
+		transform: translate(-3px, 5px) rotate(1deg);
+	}
+	32% {
+		transform: translate(3px, 2px) rotate(0deg);
+	}
+	40% {
+		transform: translate(1px, 16px) rotate(1deg);
+	}
+	45% {
+		transform: translate(-1px, 5px) rotate(-1deg);
+	}
+	60% {
+		transform: translate(-15px, 1px) rotate(0deg);
+	}
+	65% {
+		transform: translate(3px, 6px) rotate(-1deg);
+	}
+	80% {
+		transform: translate(-1px, -1px) rotate(1deg);
+	}
+	82% {
+		transform: translate(1px, 2px) rotate(0deg);
+	}
+	100% {
+		transform: translate(0px, 0px) rotate(0deg);
+	}
+}

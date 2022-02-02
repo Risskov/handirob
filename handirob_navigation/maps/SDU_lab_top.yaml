@@ -1,0 +1,7 @@
+image: SDU_lab_top.pgm
+resolution: 0.050000
+origin: [-4.729759, -6.837748, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

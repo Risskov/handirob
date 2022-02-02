@@ -1,11 +1,34 @@
 scan_filter_chain:
-- name: range
-  type: laser_filters/LaserScanRangeFilter
+- name: box
+  type: laser_filters/LaserScanBoxFilter
   params:
-    lower_threshold: 0.05
-    upper_threshold: 3.95
-- name: angle
-  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+    box_frame: base_link
+    min_x: -0.20
+    max_x: 0.2
+    min_y: -0.25
+    max_y: 0.25
+    min_z: -1.0
+    max_z: 1.0
+- name: shadows
+  type: laser_filters/ScanShadowsFilter
   params:
-    lower_angle: 4.38
-    upper_angle: 4.88
+    min_angle: 10
+    max_angle: 170
+    neighbors: 20
+    window: 1
+#- name: range
+#  type: laser_filters/LaserScanRangeFilter
+#  params:
+#    lower_threshold: 0.25
+#    upper_threshold: 15
+#- name: angle
+#  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+#  params:
+#    lower_angle: -1
+#    upper_angle: 0
+#- name: intensity
+#  type: laser_filters/LaserScanIntensityFilter
+#  params:
+#    lower_threshold: 350
+#    upper_threshold: 100000
+#    disp_histogram: 0

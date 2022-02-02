@@ -17,7 +17,7 @@ import json
 
 import fiducial_msgs.msg as aruco
 
-offset = np.array([0, 0, -0.1])
+offset = np.array([0, 0, -0.015])
 rate = 1 # in Hz  - Non static rate. The fastest rate allowed.
 
 def get_stand_data(stand_id, path):

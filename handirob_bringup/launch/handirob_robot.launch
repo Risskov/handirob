@@ -1,6 +1,7 @@
 <launch>
   <arg name="model" default="handirob"/>
   <arg name="multi_robot_name" default=""/>
+  <arg name="lifting" default="false"/>
 
   <!-- Opencr -->
   <include file="$(find handirob_bringup)/launch/opencr.launch">
@@ -10,4 +11,11 @@
   <include file="$(find handirob_bringup)/launch/handirob_remote.launch">
     <arg name="model" value="$(arg model)" />
   </include>
+  
+  <!-- Lifting -->
+  <group if="$(arg lifting)">
+    <node pkg="autonomous_nav" type="pressToLift.py" name="Lifting" output="screen">
+    </node>  
+  </group>
+
 </launch>

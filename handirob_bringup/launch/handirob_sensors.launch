@@ -1,14 +1,19 @@
 <launch>
-  <arg name="lidar" default="true"/>
+  <arg name="dual_lidar" default="true"/>
   <arg name="camera" default="true"/>
   <arg name="pointcloud" default="false"/>
 
   <!-- Lidar -->
-  <group if="$(arg lidar)">
-    <include file="$(find handirob_bringup)/launch/lds.launch">
+  <group if="$(arg dual_lidar)">
+    <include file="$(find handirob_bringup)/launch/rpLidarA1.launch">
     </include>
   </group>
-  
+
+  <group unless="$(arg dual_lidar)">
+    <include file="$(find handirob_bringup)/launch/lds_single.launch">
+    </include>
+  </group>
+
   <!-- Realsense -->
   <group if="$(arg camera)">
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">

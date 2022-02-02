@@ -1,0 +1,20 @@
+<launch>
+  <arg name="model" default="handirob"/>
+  <arg name="multi_robot_name" default=""/>
+  <arg name="lifting" default="true"/>
+
+  <!-- Module detection -->
+  <include file="$(find handirob_detection)/launch/module_detector.launch">
+  </include>
+
+  <!-- Docking server-->
+  <include file="$(find handirob_docking)/launch/docking_server.launch">
+  </include>
+  
+  <!-- Lifting server -->
+  <group if="$(arg lifting)">
+    <include file="$(find handirob_lifting)/launch/lifting_server.launch">
+    </include>
+  </group>
+
+</launch>

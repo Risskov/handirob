@@ -13,15 +13,20 @@ map_type: costmap
 obstacle_layer:
   observation_sources: scan
   #scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+  combination_method: 1
   scan:
     topic: /scan
     data_type: LaserScan
     sensor_frame: base_link
+    observation_persistance: 0.0
+    expected_update_rate: 0.5
     marking: true
     clearing: true
-    obstacle_min_range: 0.3
-    obstacle_max_range: 3.0 # max dist an obstacle will be inserted
-    raytrace_range: 3.5 # range to raytrace out obstacles from map using sensor data
+    obstacle_min_range: 0.1
+    obstacle_max_range: 4.8 # max dist an obstacle will be inserted
+    raytrace_range: 4.0 # range to raytrace out obstacles from map using sensor data
+
+
 
 voxel_layer:
   enabled: true

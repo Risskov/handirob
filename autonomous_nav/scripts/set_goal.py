@@ -49,7 +49,7 @@ def set_goal():
     rospy.loginfo("Goal sent to navigation stack.")
 
 
-def goal_handler:
+def goal_handler():
     rospy.init_node("set_goal", anonymous=True)
     pub = rospy.Publisher("/move_base_simple/goal", PoseStamped, queue_size=1)
     pos_x = rospy.get_param('/pos_x', -5.579485893249512)

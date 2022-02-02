@@ -2,16 +2,29 @@ global_costmap:
   global_frame: map
   robot_base_frame: base_link
 
-  update_frequency: 7.0
-  publish_frequency: 7.0
+  update_frequency: 5.0
+  publish_frequency: 5.0
   transform_tolerance: 0.5
-
+  
   static_map: true
-
+  rolling_window: false
+  
   inflation_layer:
-    inflation_radius: 0.35 # how much the obstacles are inflated
+    inflation_radius: 0.5 # how much the obstacles are inflated
     cost_scaling_factor: 10 # how steep the curve of values within inflated area
     
+  obstacle_layer:
+    observation_sources: scan
+  #scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+    combination_method: 1
+    scan:
+        topic: /scan
+        data_type: LaserScan
+        sensor_frame: base_link
+        observation_persistance: 0.2
+        expected_update_rate: 0.5
+        marking: false
+        
   plugins:
     - {name: static_map,  type: "costmap_2d::StaticLayer"}
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}

@@ -117,13 +117,13 @@ class DockingServer():
         print('waiting')
         if not self._wait_for_object(r):
             return
-        print('rotating')
-        if not self._initial_rotation(r):
-            return
-        # print('docking')
-        # if not self._docking(r):
+        # print('rotating')
+        # if not self._initial_rotation(r):
         #     return
-        # self._lift_module()
+        print('docking')
+        if not self._docking(r):
+            return
+        self._lift_module()
     
     def _docking_behavior_request(self, req):
         self._docking_behavior()
