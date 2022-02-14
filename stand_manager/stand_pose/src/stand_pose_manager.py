@@ -9,55 +9,41 @@ import json
 import rospkg
 
 ####### Note: 31/01/2022
-# Currently a copy of update_init_pose.py
-# Needs solution specific code.
-# Look into using a dict to keep position and such memory.. Or just update JSON / read JSON every time idc...
-# Good luck. 
+# 	using dict to keep position and such in memory..
+
+#	If all stand data is kept in memory, one can schedule a non-volatile writedown every x seconds to avoid further overhead, albeit only when dict has changed.
+#	A dict should be convertable to a file relatively easily. With minimal googling.
 
 
 
 class StandManager():
 
-    def __init__(self, _dir):
-        #self.load_pose()
-        self.dir = _dir
-        self.pose = Pose
-        self.save_pose()
-        #self.pose_dict = {'pos' : list([0, 0, 0]), 'ori' : list([0, 0, 0, 0])}
+	def __init__(self, _dir):
+		self.stand_dict = {}
+		self.load_all_stand_data()
+		self.subscriber = rospy.Subscriber("/stand_detector/Stand", Stand, self.callback, queue_size = 1)
+		
 
-    def pose_callback(self, msg):
-        self.pose = msg.pose.pose
+	def update_stand_callback(self, data):
+		# Should subscribe to topic published by stand identification algorithm.
+		# This mentioned topic can then also be subscribed to by the 'recently detected' node in the behavior tree!
+		self.stand_dict[data.id] = data
+	
+	def save_all_stand_data(self, standID):
+		# Save data to non-volatile file
+		# This should be run every x seconds
+		if len(self.stand_dict) > 0:
+			file = open(self.dir + "/stand_data.json", "w")
+			print(self.dir)
+			file.write(json.dumps(self.stand_dict))
 
-    def save_pose(self):
-        file = open(self.dir + "/init_pose.json", "w")
-        print(self.dir)
-        dict = {'pos' : list([0, 0, 0]), 'ori' : list([0, 0, 0, 0])}
-        file.write(json.dumps(dict))
-
-    def load_pose(self):
-        file = open("init_pose.json", "r")
-        self.pose_dict = json.load(file)
-        file.close()
-
-    def dict_to_msg(self):
-        self.initpose_msg.pose.position.x = self.pose_dict["pos"][0]
-        self.initpose_msg.pose.position.y = self.pose_dict["pos"][1]
-        self.initpose_msg.pose.position.z = self.pose_dict["pos"][2]
-
-        self.initpose_msg.pose.orientation.x = self.pose_dict["ori"][0]
-        self.initpose_msg.pose.orientation.y = self.pose_dict["ori"][1]
-        self.initpose_msg.pose.orientation.z = self.pose_dict["ori"][2]
-        self.initpose_msg.pose.orientation.w = self.pose_dict["ori"][3]
-
-
-    def msg_to_dict(self):
-        self.pose_dict = {'pos' : list([self.initpose_msg.pose.position.x, self.initpose_msg.pose.position.y, self.initpose_msg.pose.position.z]), 
-        'ori' : list([self.initpose_msg.pose.orientation.x, self.initpose_msg.pose.orientation.y, self.initpose_msg.pose.orientation.z, self.initpose_msg.pose.orientation.w])}    
-
-    def set_pose(self):
-        self.initpose_msg.header.frame_id = "map"
+	def load_all_stand_data(self, standID):
+		# Load data from non-volatile file. This will run only on initialization
+		file = open(self.dir + "/stand_data.json", "r")
+		self.stand_dict = json.load(file)
+		file.close()
 
 if __name__ == '__main__':
-    rospy.init_node('stand_manager')
-    StandManager()
-    rospy.spin()
+	rospy.init_node('stand_manager', anonymous=False)
+	StandManager()
+	rospy.spin()

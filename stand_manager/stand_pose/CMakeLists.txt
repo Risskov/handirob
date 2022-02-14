@@ -109,7 +109,7 @@ catkin_package(
   INCLUDE_DIRS src
   LIBRARIES stand_pose
   CATKIN_DEPENDS roscpp rospy message_generation
-  DEPENDS system_lib
+  #DEPENDS system_lib
 )
 
 ###########
