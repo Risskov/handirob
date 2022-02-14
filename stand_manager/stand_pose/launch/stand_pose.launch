@@ -1,5 +1,15 @@
 <launch>
+  <arg name="data_directory" default="$(find stand_pose)/stand_data/"/>
+  <arg name="stand_tracker" default="false"/>
 
-  <node pkg="stand_pose" type="stand_pose_node.py" name="stand_pose">
+	  <!-- stand tracker 
+  <group if="$(arg stand_tracker)">
+    <include file="$(find stand)/launch/lds_dual.launch">
+    </include>
+  </group>
+  -->
+
+  <node pkg="stand_pose" type="stand_pose_manager.py" name="stand_pose" output="screen">
+	<param name="~data_directory"   value="$(arg data_directory)"/>
   </node>
 </launch>

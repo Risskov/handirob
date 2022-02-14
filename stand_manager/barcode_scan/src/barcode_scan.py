@@ -16,36 +16,44 @@ import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from object_msgs.msg import Objects
+from stand_pose.msg import Stand
 
 
 VERBOSE=True
+SHOW_VIDEO = False
 
 class stand_identifier:
 
 	def __init__(self):
 		self.subscriber = rospy.Subscriber("/stand_projector/objects", Objects, self.callback, queue_size = 1)
+		self.publisher = rospy.Publisher("/stand_detector/Stand", Stand, queue_size=10)
 		if VERBOSE :
 			print("subscribed to /stand_projector/objects")
 
 
 	def callback(self, data):
 		#Callback function of subscribed topic. 
-		#Here images get converted
+		#Here images from stand detection algorithm are decoded using pyzbar. The decoded stand is posted to a topic.
 
 		for det in data.objects :
 			im = np.frombuffer(det.image.data, dtype=np.uint8).reshape(det.image.height, det.image.width, -1)	# Reading image from message
-			#crop = im[im.width]
+			# Image is cropped for performance and perspective reasons.
 			y,x,c = im.shape
-			startx = x//2
-			starty = y//2   
+			startx = x//2 
 			crop = im[:, startx-5:startx+5, :]
 			res = decode(crop) # Decodes the barcode in image using pyzbar.
 
 			if res != []:
-				# Stand database service call goes here
-				print(res)	# Prints decoded data
+				# Forwarding found stand _including ID_ and excluding image to other recipients
+				msg = Stand()
+				msg.header.stamp = det.header.stamp
+				if VERBOSE : 
+					print("Detected stand:", res[0][0].decode("utf-8") )
+				msg.id = res[0][0].decode("utf-8")
+				msg.pose = det.poses[0].pose
+				self.publisher.publish(msg)
 		
-			if VERBOSE:
+			if VERBOSE and SHOW_VIDEO:
 				cv2.imshow('image', crop)
 				k = cv2.waitKey(50)
 				if k == 13 or k == 27:
