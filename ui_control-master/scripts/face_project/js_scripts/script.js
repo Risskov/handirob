@@ -81,7 +81,7 @@ setBoolServer.advertise(function(request, response) {
 
 //import { look_around,	blink }	from './face_functionality.js';
 import * as face_functionality from	'./face_functionality.js';
-face_functionality.look_around(true);
+//face_functionality.look_around(true);
 face_functionality.blink(true);
 
 console.log("Script.js loaded ok");

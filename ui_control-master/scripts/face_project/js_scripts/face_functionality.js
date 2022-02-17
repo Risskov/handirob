@@ -81,25 +81,51 @@ $("body").click(function (event) {
 
 });
 
+
+
+
 $("body").keypress(function (event) {
-	if (event.key == "a") {
-		wink();
+	let x_map_high = {"q": 20, "w":40 , "e": 50, "r": 60, "t": 80};
+	let x_map_low = {"a": 20, "s":40 , "d": 50, "f": 60, "g": 80};
+	var face = $(".face");
+	
+	var randY = $("body").height();
+	if (event.key in x_map_high){
+		var randX = x_map_high[event.key]/100 * $("body").width();
+		randY = 1/3 * randY;
+		lookX = (randX - $("body").width() / 2) / $("body").width() * 60;
+		lookY = (1 - $("body").height() / 2) / $("body").height() * 100;
+		blink(false);
+		face.css({
+		transform: "translate(" + randX + "px," + randY + "px)" });
 	}
-	if (event.key == "d") {
-		wink($("#leye"), $("#lpup"));
+	else if (event.key in x_map_low){
+		var randX = x_map_low[event.key]/100 * $("body").width();
+		randY = 2/3 * randY;
+		lookX = (randX - $("body").width() / 2) / $("body").width() * 60;
+		lookY = (1 - $("body").height() / 2) / $("body").height() * 100;
+		blink(false);
+		face.css({
+		transform: "translate(" + randX + "px," + randY + "px)" });
 	}
-	if (event.key == "s") {
-		alert("Press detected");
-	}
-	if (event.key == "w") {
-		setMode("worried");
-	}
-	if (event.key == "q") {
-		setMode("angry");
-	}
-	if (event.key == "e") {
-		setMode("normal");
-	}
+	// if (event.key == "a") {
+	// 	wink();
+	// }
+	// if (event.key == "d") {
+	// 	wink($("#leye"), $("#lpup"));
+	// }
+	// if (event.key == "s") {
+	// 	alert("Press detected");
+	// }
+	// if (event.key == "w") {
+	// 	setMode("worried");
+	// }
+	// if (event.key == "q") {
+	// 	setMode("angry");
+	// }
+	// if (event.key == "e") {
+	// 	setMode("normal");
+	// }
 	
 });
 
