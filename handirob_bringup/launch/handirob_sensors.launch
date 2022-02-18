@@ -20,6 +20,9 @@
     <!--include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"-->
       <arg name="enable_sync"         value="true"/>
       <arg name="enable_pointcloud"   value="$(arg pointcloud)"/>
+      <group if="$(arg pointcloud)">
+          <arg name="filter"          value="pointcloud"/>
+      </group>
       <arg name="align_depth"         value="true"/>
       <arg name="depth_fps"           value="15"/>
       <arg name="depth_width"         value="1280"/>

@@ -16,6 +16,9 @@
 
 <launch>
 
+<arg name="cart_args" default=""/>
+<arg name="lua_config_name" default="handirob_rp_2d.lua"/>
+
 <!--
   <arg name="model" default="$(find handirob_description)/urdf/handirob.urdf.xacro" />
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
@@ -26,7 +29,8 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find handirob_description)/config
-          -configuration_basename handirob_rp_2d.lua"
+          -configuration_basename $(arg lua_config_name)
+          $(arg cart_args)"
       output="screen">
     <remap from="echoes" to="horizontal_laser_2d" />
     <remap from="/imu" to="/flat_imu" />

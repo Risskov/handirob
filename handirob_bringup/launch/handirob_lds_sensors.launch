@@ -1,7 +1,7 @@
 <launch>
   <arg name="dual_lidar" default="true"/>
   <arg name="camera" default="true"/>
-  <arg name="pointcloud" default="false"/>
+  <arg name="pointcloud" default="true"/>
 
   <!-- Lidar -->
   <group if="$(arg dual_lidar)">
@@ -19,7 +19,10 @@
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
     <!--include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"-->
       <arg name="enable_sync"         value="true"/>
-      <arg name="enable_pointcloud"   value="$(arg pointcloud)"/>
+      <group if="$(arg pointcloud)">
+        <arg name="enable_pointcloud"   value="$(arg pointcloud)"/>
+        <arg name="filters"   value="pointcloud"/>
+      </group>
       <arg name="align_depth"         value="true"/>
       <arg name="depth_fps"           value="15"/>
       <arg name="depth_width"         value="1280"/>

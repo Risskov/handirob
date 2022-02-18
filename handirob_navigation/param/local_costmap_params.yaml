@@ -13,8 +13,8 @@ local_costmap:
   resolution: 0.05 #0.05 # low resolution (>=0.05) may result in overlap in narrow pathways, resulting in no path
 
   inflation_layer:
-    inflation_radius: 0.25 # how much the obstacles are inflated
-    cost_scaling_factor: 10 # how steep the curve of values within inflated area
+    inflation_radius: 0.15 # how much the obstacles are inflated
+    cost_scaling_factor: 6 # how steep the curve of values within inflated area
 
 obstacle_layer:
   observation_sources: scan
@@ -35,6 +35,6 @@ obstacle_layer:
 
   plugins:
     - {name: static_map,  type: "costmap_2d::StaticLayer"}
-   # - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
     - {name: voxel_layer, type: "costmap_2d::VoxelLayer"}
     - {name: inflation_layer,   type: "costmap_2d::InflationLayer"}

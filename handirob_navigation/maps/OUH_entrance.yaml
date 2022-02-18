@@ -1,0 +1,7 @@
+image: OUH_entrance.pgm
+resolution: 0.050000
+origin: [-24.842200, -8.682150, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

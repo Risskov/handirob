@@ -1,7 +1,7 @@
 <launch>
   <!-- Arguments -->
   <arg name="model" default="handirob"/>
-  <arg name="map_file" default="$(find handirob_navigation)/maps/lab_rplidar.yaml"/>
+  <arg name="map_file" default="$(find handirob_navigation)/maps/map_dual_lidar.yaml"/>
   <arg name="open_rviz" default="false"/>
   <arg name="move_forward_only" default="false"/>
 
