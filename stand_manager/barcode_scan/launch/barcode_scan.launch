@@ -1,0 +1,5 @@
+<launch> 
+ 
+ <node pkg="barcode_scan" type="barcode_scan.py" name="stand_identifier" output="screen">
+  </node>
+</launch>

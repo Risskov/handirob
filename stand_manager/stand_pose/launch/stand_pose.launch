@@ -1,13 +1,18 @@
 <launch>
   <arg name="data_directory" default="$(find stand_pose)/stand_data/"/>
-  <arg name="stand_tracker" default="false"/>
+  <arg name="stand_tracker" default="true"/>
+  <arg name="stand_tracker_visualizer" default="true"/>
 
-	  <!-- stand tracker 
+	  <!-- stand tracker -->
   <group if="$(arg stand_tracker)">
-    <include file="$(find stand)/launch/lds_dual.launch">
+    <include file="$(find object_launch)/launch/stand_tracker.launch">
     </include>
+      <!-- barcode scanner -->
+  <include file="$(find barcode_scan)/launch/barcode_scan.launch">
+  </include>
+
   </group>
-  -->
+  
 
   <node pkg="stand_pose" type="stand_pose_manager.py" name="stand_pose" output="screen">
 	<param name="~data_directory"   value="$(arg data_directory)"/>

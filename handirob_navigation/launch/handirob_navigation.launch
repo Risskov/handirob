@@ -11,6 +11,9 @@
 
   <!-- AMCL -->
   <include file="$(find handirob_navigation)/launch/amcl.launch"/>
+  
+  <!-- initial pose manager -->
+  <node name="init_pose_manager" pkg="handirob_navigation" type="init_pose_manager_node.py"/>
 
   <!-- move_base -->
   <include file="$(find handirob_navigation)/launch/move_base.launch">

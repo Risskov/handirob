@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   actionlib
   geometry_msgs 
+  stand_pose
 )
 
 ## Behavior tree cpp v3 dependancy
@@ -39,6 +40,7 @@ catkin_package(
   move_base_msgs 
   actionlib
   geometry_msgs 
+  stand_pose
 )
 
 ###########
@@ -63,7 +65,13 @@ add_library(move_to ${PROJECT_SOURCE_DIR}/src/action_nodes/move_to.cc )
 target_link_libraries(move_to BT::behaviortree_cpp_v3)
 target_link_libraries(move_to ${LIBS} ${catkin_LIBRARIES})
 
+add_library(recognize_detection ${PROJECT_SOURCE_DIR}/src/action_nodes/recognize_detection.cc )
+add_dependencies(recognize_detection ${catkin_EXPORTED_TARGETS})
+target_link_libraries(recognize_detection BT::behaviortree_cpp_v3)
+target_link_libraries(recognize_detection ${LIBS} ${catkin_LIBRARIES})
+
+
 
 add_executable(handirob_behavior_tree ${PROJECT_SOURCE_DIR}/src/handirob_behavior_tree.cc ${HEADER_FILES})
-target_link_libraries(handirob_behavior_tree set_mood move_to BT::behaviortree_cpp_v3 ${catkin_LIBRARIES})
+target_link_libraries(handirob_behavior_tree set_mood move_to recognize_detection BT::behaviortree_cpp_v3 ${catkin_LIBRARIES})
 

@@ -7,7 +7,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
 
-// others
+// Behavior tree
 #include "behaviortree_cpp_v3/behavior_tree.h"
 
 class MoveTo : public BT::CoroActionNode

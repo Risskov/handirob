@@ -53,7 +53,6 @@ class StandManager():
 		except:
 			print("file", self.dir + "/stand_data.npy", " not found")
 		else:
-			print(self.stand_dict)
 			print("Loaded ", str(len(self.stand_dict)) , " entries from ", self.dir + "/stand_data.npy")
 
 if __name__ == '__main__':
