@@ -94,7 +94,7 @@ $("body").keypress(function (event) {
 		var randX = x_map_high[event.key]/100 * $("body").width();
 		randY = 1/3 * randY;
 		lookX = (randX - $("body").width() / 2) / $("body").width() * 60;
-		lookY = (1 - $("body").height() / 2) / $("body").height() * 100;
+		lookY = (1 - $("body").height() / 2) / $("body").height() * 150;
 		blink(false);
 		face.css({
 		transform: "translate(" + randX + "px," + randY + "px)" });
