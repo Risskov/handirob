@@ -16,20 +16,30 @@ scan_filter_chain:
     max_angle: 170
     neighbors: 20
     window: 1
+    
 - name: range
- type: laser_filters/LaserScanRangeFilter
- params:
+  type: laser_filters/LaserScanRangeFilter
+  params:
    lower_threshold: 0.1
    upper_threshold: 15
+    
+- name: intensity
+  type: laser_filters/LaserScanIntensityFilter
+  params:
+   lower_threshold: 30
+   upper_threshold: 100000
+   disp_histogram: 0
+   
+- name: speckle_filter
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    filter_type: 0
+    max_range: 4.0
+    max_range_difference: 0.2
+    filter_window: 3
 #- name: angle
 #  type: laser_filters/LaserScanAngularBoundsFilterInPlace
  # params:
  #   lower_angle: -1
  #   upper_angle: -2
     # upper_angle: 1.74
-- name: intensity
-  type: laser_filters/LaserScanIntensityFilter
-  params:
-   lower_threshold: 50
-   upper_threshold: 100000
-   disp_histogram: 0

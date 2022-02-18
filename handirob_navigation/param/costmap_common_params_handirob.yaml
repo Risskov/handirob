@@ -18,10 +18,12 @@ obstacle_layer:
     topic: /scan
     data_type: LaserScan
     sensor_frame: base_link
-    observation_persistance: 0.0
+    observation_persistance: 2
+    inf_is_valid: true
     expected_update_rate: 0.5
     marking: true
     clearing: true
+    footprint_clearing_enabled: true
     obstacle_min_range: 0.1
     obstacle_max_range: 4.8 # max dist an obstacle will be inserted
     raytrace_range: 4.0 # range to raytrace out obstacles from map using sensor data
