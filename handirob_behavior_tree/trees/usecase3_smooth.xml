@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <BehaviorTree ID="MainTree">
+        <Sequence name="root">
+           <!--  <Parallel name="monitors" threshold="2">
+                <Condition ID="CameraUpdateMonitor" name="camera_update_monitor"/>
+                <Condition ID="LocalizationUpdateMonitor" name="localization_update_monitor"/>
+            </Parallel> -->
+            <Sequence name="usecase3">
+                <SetBlackboard output_key="turn_angles" value="45.0;-90.0;45.0" />
+                <SetBlackboard output_key="not" value="3" />
+                <SubTree ID="PeopleDetection" turn_angles="turn_angles" detected_people="dp" not="not"/>
+                <Fallback name="people_grouping">
+                    <Action ID="GroupPeople" detected_people="{dp}" name="group_people" no_of_groups="nog" people_groups="pg"/>
+                </Fallback>
+                <Fallback name="planning">
+                    <Action ID="InteractionPlanner" name="interaction_planner" people_groups="{pg}" plans="plans"/>
+                </Fallback>
+                <Repeat num_cycles="{nog}">
+                    <ForceSuccess>
+                        <Sequence name="plan_execution">
+                            <Action ID="PlanExecuter" name="plan_executer" no_of_people="no_of_people"  people="people" plans="{plans}"/>
+                            <RetryUntilSuccesful num_attempts="1000000000">
+                                <Action ID="GetAttention" no_of_people_in_group="{no_of_people}"/>
+                            </RetryUntilSuccesful>
+                            <!-- <RetryUntilSuccesful num_attempts="100000">
+                                <Action ID="GazeDetector" people=""/>
+                            </RetryUntilSuccesful> -->
+                            <RetryUntilSuccesful num_attempts="1000000000">
+                                <Parallel threshold="2">
+                                    <Action ID="EyeContact" no_of_people_in_group="{no_of_people}"/>
+                                    <Action ID="Interaction"/>
+                                </Parallel>
+                            </RetryUntilSuccesful>
+                        </Sequence>
+                    </ForceSuccess>    
+                </Repeat>
+            </Sequence>
+            <Action ID="GoHome" name="go_home"/>
+        </Sequence>
+    </BehaviorTree>
+
+     <BehaviorTree ID="PeopleDetection">            
+        <Repeat num_cycles="{not}">
+            <ForceSuccess>    
+                <Sequence name="people_detection_main">
+                    <Action ID="TurnExecuter" name="turn_executer" turn_angles="{turn_angles}" turn_angle="ta"/>
+                    <Action ID="Turn" name="turn" turn_angle="{ta}" />
+                    <!-- <RetryUntilSuccesful num_attempts="10">
+                        <Condition ID="CameraUpdateMonitor" name="camera_update_monitor"/>
+                    </RetryUntilSuccesful> -->
+                    <Action ID="DetectPeople" detected_people="{detected_people}"/>
+                </Sequence>
+            </ForceSuccess>
+        </Repeat>
+    </BehaviorTree>
+
+    <BehaviorTree ID="GazeDetection">              
+        <Sequence name="gaze_detection_main">
+            <RetryUntilSuccesful num_attempts="2">
+                <Action ID="GazeDetector" name="gaze_detector" person="{person}" />
+            </RetryUntilSuccesful>
+        </Sequence>
+    </BehaviorTree>
+</root>
