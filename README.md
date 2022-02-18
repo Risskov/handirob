@@ -34,7 +34,7 @@ It is now possible to give it a 2D Nav goal, which the robot will try to reach t
 
 ### Launch Cartographer SLAM
 If a new map is needed to be generated run the following SLAM command  
-`roslaunch handirob_bringup handirob_cart_nav.launch`  
+`roslaunch handirob_navigation handirob_cart_nav.launch`  
 Additionally start teleoperation to move the robot around and it will start mapping.  
 When done mapping, save the map with:  
 `rosrun map_server map_saver -f $(file_name)`  
