@@ -107,7 +107,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS src
-  LIBRARIES stand_pose
+  #LIBRARIES stand_pose
   CATKIN_DEPENDS roscpp rospy message_generation
   #DEPENDS system_lib
 )
