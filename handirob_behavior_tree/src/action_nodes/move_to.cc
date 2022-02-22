@@ -18,6 +18,7 @@ BT::PortsList MoveTo::providedPorts()
 
 BT::NodeStatus MoveTo::tick()
 {
+	halt_requested_ = false;
     BT::Optional<geometry_msgs::Pose> waypoint = getInput<geometry_msgs::Pose>("waypoint");
     // Check if optional is valid. If not, throw its error
     if (!waypoint)

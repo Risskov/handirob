@@ -6,14 +6,11 @@ RecognizeDetection::RecognizeDetection(const std::string& name, const BT::NodeCo
 {	
 	//Init code
 	sub = nh_.subscribe<stand_pose::Stand>("/stand_detector/Stand", 10, &RecognizeDetection::standCallback_, this);
-	BT::Optional<std::string> stand_id = getInput<std::string>("standID");
-	if (!stand_id){
-		throw BT::RuntimeError("missing required input [standID]: ", stand_id.error() );
-	}
-	stand_id_ = stand_id.value();
 }
 
 BT::NodeStatus RecognizeDetection::tick(){
+	halt_requested_ = false;
+	detected_ = false;
 	BT::Optional<std::string> stand_id = getInput<std::string>("standID");
 	if (!stand_id){
 		throw BT::RuntimeError("missing required input [standID]. got ", stand_id.error());
