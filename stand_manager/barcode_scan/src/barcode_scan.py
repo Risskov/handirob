@@ -51,6 +51,7 @@ class stand_identifier:
 					print("Detected stand:", res[0][0].decode("utf-8") )
 				msg.id = res[0][0].decode("utf-8")
 				msg.pose = det.poses[0].pose
+				msg.known = True
 				self.publisher.publish(msg)
 		
 			if VERBOSE and SHOW_VIDEO:

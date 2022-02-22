@@ -33,8 +33,8 @@ def swivel(speed, sleepTime):
 rospy.init_node('SimpleTurning')
 cmd_publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
 turning = rospy.Publisher("cmd_vel", Twist, queue_size = 10)
-while True:
-    swivel(0.1, 1)
 
-rospy.spin()
+while not rospy.is_shutdown():
+        swivel(0.1, 1)
+
 

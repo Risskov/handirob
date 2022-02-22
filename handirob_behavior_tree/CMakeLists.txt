@@ -65,6 +65,10 @@ add_library(move_to ${PROJECT_SOURCE_DIR}/src/action_nodes/move_to.cc )
 target_link_libraries(move_to BT::behaviortree_cpp_v3)
 target_link_libraries(move_to ${LIBS} ${catkin_LIBRARIES})
 
+add_library(update_stand_pose ${PROJECT_SOURCE_DIR}/src/action_nodes/update_stand_pose.cc )
+target_link_libraries(update_stand_pose BT::behaviortree_cpp_v3)
+target_link_libraries(update_stand_pose ${LIBS} ${catkin_LIBRARIES})
+
 add_library(recognize_detection ${PROJECT_SOURCE_DIR}/src/action_nodes/recognize_detection.cc )
 add_dependencies(recognize_detection ${catkin_EXPORTED_TARGETS})
 target_link_libraries(recognize_detection BT::behaviortree_cpp_v3)
